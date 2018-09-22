@@ -1,0 +1,26 @@
+image: node:9.2.0
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - test
+  - deploy
+
+test_index:
+  stage: test
+  script:
+    - npm install # just check if it installs lol // todo: add tests??????
+
+deploy:
+  stage: deploy
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - ssh-add <(echo "$PRIVATE_KEY")
+    - ssh -p22 metastruct@threekelv.in "git -C ~/meta-pixels pull && tmux new-session -s 'meta-pixels' -d 'node ./index.js'"
+  when: on_success
