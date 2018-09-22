@@ -22,5 +22,5 @@ deploy:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh-add <(echo "$PRIVATE_KEY")
-    - ssh metastruct@threekelv.in meta-pixels
+    - ssh deploy@threekelv.in meta-pixels
   when: on_success
