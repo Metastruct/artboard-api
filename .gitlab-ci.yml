@@ -22,5 +22,5 @@ deploy:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh-add <(echo "$PRIVATE_KEY")
-    - ssh -p22 metastruct@threekelv.in "git -C ~/meta-pixels pull && tmux new-session -s 'meta-pixels' -d 'node ./index.js'"
+    - ssh -p22 metastruct@threekelv.in "git -C ~/meta-pixels pull && tmux new-session -s 'meta-pixels' -d 'node ~/meta-pixels/index.js'"
   when: on_success
