@@ -1,0 +1,21 @@
+{
+  "name": "meta-pixels",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "canvas": "^1.6.11",
+    "color-convert": "^1.9.3",
+    "express": "^4.16.3",
+    "express-ipfilter": "^0.3.1",
+    "express.js": "^1.0.0",
+    "twitter": "^1.7.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Wicopee",
+  "license": "ISC"
+}
