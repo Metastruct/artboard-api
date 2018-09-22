@@ -31,10 +31,10 @@ var pattern = [
 
 for(i=0;i<16;i++) {
 	var rgb = convert.hsv.rgb(22.5*i,100,100);
-	pattern[pattern.length]="rgb(" + rgb[0].toString() + "," + rgb[1].toString() + "," + rgb[2].toString() + ")";
+	pattern.push("rgb(" + rgb[0].toString() + "," + rgb[1].toString() + "," + rgb[2].toString() + ")")
 }
 
-pattern[pattern.length]="rgb(127,127,127)";
+pattern.push("rgb(127,127,127)");
 
 app.post("/draw",function(req,res) {
 	if(!req.body.img) return res.status(403).send("req.body.img missing");
