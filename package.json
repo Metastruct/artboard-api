@@ -5,12 +5,13 @@
   "main": "index.js",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "canvas": "^1.6.11",
+    "canvas": "^2.3.0",
+    "canvas-prebuilt": "^2.0.0-alpha.14",
     "color-convert": "^1.9.3",
     "express": "^4.16.3",
     "express-ipfilter": "^0.3.1",
-    "express.js": "^1.0.0",
-    "twitter": "^1.7.1"
+    "gifencoder": "^2.0.1",
+    "png-file-stream": "^1.2.1"
   },
   "devDependencies": {},
   "scripts": {
