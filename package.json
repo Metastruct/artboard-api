@@ -6,7 +6,6 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "canvas": "^2.3.0",
-    "canvas-prebuilt": "^2.0.0-alpha.14",
     "color-convert": "^1.9.3",
     "express": "^4.16.3",
     "express-ipfilter": "^0.3.1",
