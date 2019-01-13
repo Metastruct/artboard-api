@@ -3,7 +3,7 @@ const express = require('express')
 module.exports = function(app) {
     let router = express.Router()
 
-    router.get('/image/create', (req, res) => {
+    router.post('/image/create', (req, res) => {
         if(!req.body.img) return res.status(400).send("req.body.img missing");
         const data = JSON.parse(req.body.img);
 
