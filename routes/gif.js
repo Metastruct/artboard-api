@@ -31,11 +31,30 @@ module.exports = function(app) {
         res.send({success: true})
     })
 
-    router.get('/gif/create', check, async (req, res) => {
+    router.get('/gif/create', check, async (req, resf) => {
         await app.imagePrinter.mergeGIFFramesAndClean();
-
-        res.sendFile(path.join(__dirname, '../', 'pixels.gif'));
+	
+	let id = null;
+	await new Promise((res, rej) => {
+		let opts = { fetchUrl: 'http://' + process.env.host + ':10010/gif/tops', title: 'Meta Construct Pixels Result - ' + new Date }
+		app.gfycat.upload(opts, (err, resp) => {
+			if(err) rej(err);
+			id = resp.gfyname;
+			
+			setInterval(function() {
+				app.gfycat.checkUploadStatus(resp.gfyname, (err, rs) => {
+					if(rs.task == "complete") res();
+				})
+			}, 2000)
+		})
+	})
+	
+	resf.send({id: id})
     })
+
+	router.get('/gif/tops', function(req, res) {
+		res.sendFile(path.join(__dirname, '../', 'pixels.gif'));
+	})
 
     return router
 }
