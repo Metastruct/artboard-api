@@ -41,9 +41,12 @@ module.exports = function(app) {
 			if(err) rej(err);
 			id = resp.gfyname;
 			
-			setInterval(function() {
+			let intr = setInterval(function() {
 				app.gfycat.checkUploadStatus(resp.gfyname, (err, rs) => {
-					if(rs.task == "complete") res();
+					if(rs.task == "complete") {
+					    res();
+					    cleanInterval(intr)
+					}
 				})
 			}, 2000)
 		})
