@@ -38,7 +38,7 @@ module.exports = function(app) {
 	await new Promise((res, rej) => {
 		let opts = { fetchUrl: 'http://' + process.env.host + ':10010/gif/tops', title: 'Meta Construct Pixels Result - ' + new Date }
 		app.gfycat.upload(opts, (err, resp) => {
-			if(err) rej(err);
+			if(err) { rej(err); console.error(err) }
 			id = resp.gfyname;
 			
 			let intr = setInterval(function() {
