@@ -46,7 +46,7 @@ module.exports = function(app) {
 				app.gfycat.checkUploadStatus(resp.gfyname, (err, rs) => {
 					if(rs.task == "complete") {
 					    res();
-					    cleanInterval(intr)
+					    clearInterval(intr)
 					}
 				})
 			}, 2000)
