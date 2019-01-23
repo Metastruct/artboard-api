@@ -26,6 +26,8 @@ module.exports = function(app) {
         let stream = app.imagePrinter.makeImage(data)
         let files = app.utils.findMatchesInArray(fs.readdirSync('gifframes'), "frame?")
         
+        console.log('creating a frame #' + files.length)
+        
         stream.pipe(fs.createWriteStream('gifframes/frame' + files.length + '.png'))
 
         res.send({success: true})
@@ -33,27 +35,29 @@ module.exports = function(app) {
 
     router.get('/gif/create', check, async (req, resf) => {
         await app.imagePrinter.mergeGIFFramesAndClean();
+        
+        console.log('creating a gif')
 	
-	let id = null;
-	await new Promise((res, rej) => {
-		let opts = { fetchUrl: 'http://' + process.env.host + ':10010/gif/tops', title: 'Meta Construct Pixels Result - ' + new Date }
-		app.gfycat.upload(opts, (err, resp) => {
-			if(err) rej(err);
-			console.log(resp)
-			id = resp.gfyname;
-			
-			let intr = setInterval(function() {
-				app.gfycat.checkUploadStatus(resp.gfyname, (err, rs) => {
-					if(rs.task == "complete") {
-					    res();
-					    clearInterval(intr)
-					}
-				})
-			}, 2000)
-		})
-	})
-	
-	resf.send({id: id})
+    	let id = null;
+    	await new Promise((res, rej) => {
+    		let opts = { fetchUrl: 'http://' + process.env.host + ':10010/gif/tops', title: 'Meta Construct Pixels Result - ' + new Date }
+    		app.gfycat.upload(opts, (err, resp) => {
+    			if(err) rej(err);
+    			console.log(resp)
+    			id = resp.gfyname;
+    			
+    			let intr = setInterval(function() {
+    				app.gfycat.checkUploadStatus(resp.gfyname, (err, rs) => {
+    					if(rs.task == "complete") {
+    					    res();
+    					    clearInterval(intr)
+    					}
+    				})
+    			}, 2000)
+    		})
+    	})
+    	
+    	resf.send({id: id})
     })
 
 	router.get('/gif/tops', function(req, res) {
