@@ -1,8 +1,9 @@
-let APIKEY = "fBmKzfPXsoXPH1Os"
-
 const express = require('express')
 const fs = require('fs')
 const path = require('path')
+const moment = require('moment')
+
+let APIKEY = "fBmKzfPXsoXPH1Os";
 
 function check(req, res, next) {
     let auth = req.get('Authorization')
@@ -24,11 +25,11 @@ module.exports = function(app) {
         const data = JSON.parse(req.body.img);
 
         let stream = app.imagePrinter.makeImage(data)
-        let files = app.utils.findMatchesInArray(fs.readdirSync('gifframes'), "frame?")
+        let name = moment().format('MM-DD-YY')
         
-        console.log('creating a frame #' + files.length)
+        console.log('creating/overwriting a frame "' + name + '"')
         
-        stream.pipe(fs.createWriteStream('gifframes/frame' + files.length + '.png'))
+        stream.pipe(fs.createWriteStream('gifframes/frame_' + name + '.png'))
 
         res.send({success: true})
     })
@@ -40,17 +41,22 @@ module.exports = function(app) {
 	
     	let id = null;
     	await new Promise((res, rej) => {
-    		let opts = { fetchUrl: 'http://' + process.env.host + ':10010/gif/tops', title: 'Meta Construct Pixels Result - ' + new Date }
+    		let opts = { fetchUrl: 'http://' + process.env.host + ':10010/gif/tops', title: 'Meta Construct Pixels Result - ' + moment().format('MM.DD.YYYY') }
     		app.gfycat.upload(opts, (err, resp) => {
     			if(err) rej(err);
-    			console.log(resp)
-    			id = resp.gfyname;
     			
-    			let intr = setInterval(function() {
+    			id = resp.gfyname;
+                console.log('gfycat> [' + id + '] processing pixels gif...')
+                
+    			let interval = setInterval(function() {
     				app.gfycat.checkUploadStatus(resp.gfyname, (err, rs) => {
+                        if(err) return;
+
     					if(rs.task == "complete") {
-    					    res();
-    					    clearInterval(intr)
+                            console.log('gfycat> [' + id + '] processing done.')
+
+                            res();
+    					    clearInterval(interval);
     					}
     				})
     			}, 2000)
