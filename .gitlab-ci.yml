@@ -1,8 +1,5 @@
-image: node:9.2.0
+image: alpine:latest
 
-cache:
-  paths:
-    - node_modules/
 
 stages:
   - test
@@ -11,22 +8,22 @@ stages:
 test_index:
   stage: test
   before_script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - 'which ssh-agent || ( apk --update add openssh-client bash)'
     - mkdir -p ~/.ssh
     - eval $(ssh-agent -s)
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh-add <(echo "$PRIVATE_KEY")
+    - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
     - ssh metastruct@threekelv.in meta-pixels test
 
 deploy:
   stage: deploy
   before_script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - 'which ssh-agent || ( apk --update add openssh-client bash)'
     - mkdir -p ~/.ssh
     - eval $(ssh-agent -s)
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - ssh-add <(echo "$PRIVATE_KEY")
+    - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
     - ssh metastruct@threekelv.in meta-pixels deploy
   when: on_success
