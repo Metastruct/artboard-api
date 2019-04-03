@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "body-parser": "^1.18.3",
-    "canvas": "^2.3.0",
+    "canvas": "^2.4.1",
     "color-convert": "^1.9.3",
     "express": "^4.16.3",
     "express-ipfilter": "^0.3.1",
