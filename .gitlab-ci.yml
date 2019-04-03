@@ -11,9 +11,13 @@ stages:
 test_index:
   stage: test
   before_script:
-    - apt-get update -y && apt-get install -y build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
-    - npm install # just check if it installs lol // todo: add tests??????
+    - ssh-add <(echo "$PRIVATE_KEY")
+    - ssh metastruct@threekelv.in meta-pixels test
 
 deploy:
   stage: deploy
@@ -24,5 +28,5 @@ deploy:
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - ssh-add <(echo "$PRIVATE_KEY")
-    - ssh metastruct@threekelv.in meta-pixels
+    - ssh metastruct@threekelv.in meta-pixels deploy
   when: on_success
