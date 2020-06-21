@@ -37,8 +37,6 @@ module.exports = class Web extends EventEmitter {
     this.send(ws, 'imageInfo', {
       image,
       palette,
-      imageWidth,
-      imageHeight,
       timeoutTime,
     });
 
