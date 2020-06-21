@@ -14,8 +14,18 @@ module.exports = class GameLogic {
 
     this.loadPalette();
     this.loadImage();
+    this.bindWebsocketEvents();
 
     process.on('beforeExit', () => this.saveImage());
+  }
+
+  bindWebsocketEvents() {
+    let ws = this.app.Web;
+
+    ws.on('add-pixel', ({ x, y, color, steamId }, _ws, hasWriteAccess) => {
+      if (!hasWriteAccess) return;
+      this.addPixel(x, y, color, steamId);
+    });
   }
 
   addPixel(x, y, color, steamId) {
