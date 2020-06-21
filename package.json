@@ -17,6 +17,8 @@
   },
   "homepage": "https://gitlab.com/metastruct/pixels-web-api#readme",
   "dependencies": {
-    "fastintcompression": "0.0.3"
+    "express": "^4.17.1",
+    "fastintcompression": "0.0.3",
+    "ws": "^7.3.0"
   }
 }
