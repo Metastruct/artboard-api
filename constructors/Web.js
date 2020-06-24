@@ -30,7 +30,10 @@ module.exports = class Web extends EventEmitter {
   }
 
   onConnection(ws) {
-    let hasWriteAccess = this.writeIPs.indexOf(ws._socket.remoteAddress) >= 0;
+    let ip = ws._socket.remoteAddress
+    ip = ip.startsWith('::ffff:') ? ip.slice(7) : ip;
+
+    let hasWriteAccess = this.writeIPs.indexOf(ip) >= 0;
     let { image, palette, timeoutTime } = this.app.GameLogic;
 
     this.send(ws, 'writeAccess', hasWriteAccess);
