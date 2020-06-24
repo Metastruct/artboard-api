@@ -1,6 +1,7 @@
 const fs = require('fs');
 const FastIntegerCompression = require('fastintcompression');
 const cleanup = require('node-cleanup');
+const colorsys = require('colorsys');
 
 module.exports = class GameLogic {
   constructor(app) {
@@ -45,16 +46,17 @@ module.exports = class GameLogic {
 
     this.palette = [];
 
-    let { colored, gray } = this.paletteSettings,
-      { hsvToRgb } = this.app.Utils;
+    let { colored, gray } = this.paletteSettings;
     let hueNum = 360 / colored;
 
     for (let i = 1; i <= gray; i++) {
-      this.palette.push(hsvToRgb(0, 0, 1 / i));
+      let { r, g, b } = colorsys.hsv2Rgb(0, 0, 100 / i);
+      this.palette.push([ r, g, b ]);
     }
 
     for (let i = 1; i <= colored; i++) {
-      this.palette.push(hsvToRgb(hueNum * i, 1, 1));
+      let { r, g, b } = colorsys.hsv2Rgb(hueNum * i, 100, 100);
+      this.palette.push([ r, g, b ]);
     }
 
     console.log('Palette colors in total:', this.palette.length);
