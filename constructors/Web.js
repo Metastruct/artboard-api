@@ -16,7 +16,7 @@ module.exports = class Web extends EventEmitter {
 
     this.websocket.on('connection', (ws) => this.onConnection(ws));
 
-    this.httpServer.listen(10010, () => console.log('Server listening on :10010'));
+    this.httpServer.listen(10010, '0.0.0.0', () => console.log('Server listening on :10010'));
   }
 
   send(ws, op, data) {
@@ -30,10 +30,7 @@ module.exports = class Web extends EventEmitter {
   }
 
   onConnection(ws) {
-    let ip = ws._socket.remoteAddress
-    ip = ip.startsWith('::ffff:') ? ip.slice(7) : ip;
-
-    let hasWriteAccess = this.writeIPs.indexOf(ip) >= 0;
+    let hasWriteAccess = this.writeIPs.indexOf(ws._socket.remoteAddress) >= 0;
     let { image, palette, timeoutTime } = this.app.GameLogic;
 
     this.send(ws, 'writeAccess', hasWriteAccess);
