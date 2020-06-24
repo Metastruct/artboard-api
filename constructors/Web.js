@@ -16,7 +16,7 @@ module.exports = class Web extends EventEmitter {
 
     this.websocket.on('connection', (ws) => this.onConnection(ws));
 
-    this.httpServer.listen(10010);
+    this.httpServer.listen(10010, () => console.log('Server listening on :10010'));
   }
 
   send(ws, op, data) {

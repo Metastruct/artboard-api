@@ -19,6 +19,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "fastintcompression": "0.0.3",
+    "node-cleanup": "^2.1.2",
     "ws": "^7.3.0"
   }
 }

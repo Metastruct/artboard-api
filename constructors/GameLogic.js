@@ -1,5 +1,6 @@
 const fs = require('fs');
 const FastIntegerCompression = require('fastintcompression');
+const cleanup = require('node-cleanup');
 
 module.exports = class GameLogic {
   constructor(app) {
@@ -16,7 +17,7 @@ module.exports = class GameLogic {
     this.loadImage();
     this.bindWebsocketEvents();
 
-    process.on('beforeExit', () => this.saveImage());
+    cleanup(() => this.saveImage());
   }
 
   bindWebsocketEvents() {
@@ -39,6 +40,8 @@ module.exports = class GameLogic {
   }
 
   loadPalette() {
+    console.log('Loading palette...');
+
     this.palette = [];
 
     let { colored, gray } = this.paletteSettings,
@@ -52,9 +55,13 @@ module.exports = class GameLogic {
     for (let i = 1; i <= colored; i++) {
       this.palette.push(hsvToRgb(hueNum * i, 100, 100));
     }
+
+    console.log('Palette colors in total:', this.palette.length);
   }
 
   createImage() {
+    console.log('Creating a blank image...');
+
     let space = this.imageWidth * this.imageHeight;
     for (let i = 1; i <= space; i++) {
       this.image[i] = 0;
@@ -62,8 +69,6 @@ module.exports = class GameLogic {
   }
 
   loadImage() {
-    if (!fs.existsSync('save.dat')) return this.createImage();
-
     console.log('Loading image...');
 
     try {
@@ -77,6 +82,9 @@ module.exports = class GameLogic {
   }
 
   saveImage() {
-    fs.writeFileSync('save.dat', FastIntegerCompression.compress(this.image));
+    console.log('Saving image...');
+
+    let compressed = FastIntegerCompression.compress(this.image);
+    fs.writeFileSync('save.dat', Buffer.from(compressed));
   }
 };
