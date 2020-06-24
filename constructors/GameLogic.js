@@ -49,11 +49,11 @@ module.exports = class GameLogic {
     let hueNum = 360 / colored;
 
     for (let i = 1; i <= gray; i++) {
-      this.palette.push(hsvToRgb(0, 0, 100 / i));
+      this.palette.push(hsvToRgb(0, 0, 1 / i));
     }
 
     for (let i = 1; i <= colored; i++) {
-      this.palette.push(hsvToRgb(hueNum * i, 100, 100));
+      this.palette.push(hsvToRgb(hueNum * i, 1, 1));
     }
 
     console.log('Palette colors in total:', this.palette.length);
