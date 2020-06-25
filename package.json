@@ -17,9 +17,12 @@
   },
   "homepage": "https://gitlab.com/metastruct/pixels-web-api#readme",
   "dependencies": {
+    "canvas": "^2.6.1",
     "colorsys": "^1.0.22",
     "express": "^4.17.1",
     "fastintcompression": "0.0.3",
+    "gm": "^1.23.1",
+    "moment": "^2.27.0",
     "node-cleanup": "^2.1.2",
     "ws": "^7.3.0"
   }

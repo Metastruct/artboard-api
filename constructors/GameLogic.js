@@ -51,12 +51,12 @@ module.exports = class GameLogic {
 
     for (let i = 1; i <= gray; i++) {
       let { r, g, b } = colorsys.hsv2Rgb(0, 0, 100 / i);
-      this.palette.push([ r, g, b ]);
+      this.palette.push([r, g, b]);
     }
 
     for (let i = 1; i <= colored; i++) {
       let { r, g, b } = colorsys.hsv2Rgb(hueNum * i, 100, 100);
-      this.palette.push([ r, g, b ]);
+      this.palette.push([r, g, b]);
     }
 
     console.log('Palette colors in total:', this.palette.length);
