@@ -25,5 +25,9 @@
     "moment": "^2.27.0",
     "node-cleanup": "^2.1.2",
     "ws": "^7.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^7.3.1",
+    "prettier": "^2.0.5"
   }
 }

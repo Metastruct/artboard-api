@@ -54,4 +54,4 @@ module.exports = class Renderer {
     for (let file of files) 
       await fs.unlink(`frames/${file}`);
   }
-}
+};

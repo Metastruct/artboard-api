@@ -46,7 +46,7 @@ module.exports = class Web extends EventEmitter {
       try {
         str = JSON.parse(str);
         if (str.op && str.data) this.emit(str.op, str.data, ws, hasWriteAccess);
-      } catch (err) {}
+      } catch (err) {} // eslint-disable-line no-empty
     });
   }
 };
