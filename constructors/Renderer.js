@@ -1,5 +1,5 @@
 const canvas = require('canvas');
-const fs = require('fs').promises;
+const { promises, createWriteStream } = require('fs');
 const gm = require('gm');
 const moment = require('moment');
 const { promisify } = require('util');
@@ -32,11 +32,11 @@ module.exports = class Renderer {
 
     console.log(`Creating/overwriting a frame "${fileName}"...`);
     
-    return stream.pipe(fs.createWriteStream(`frames/frame_${fileName}.png`));
+    return stream.pipe(createWriteStream(`frames/frame_${fileName}.png`));
   }
 
   async renderGIF() {
-    let files = (await fs.readdir('frames'))
+    let files = (await promises.readdir('frames'))
       .sort(this.app.Utils.sortAlphaNum);
     
     console.log('Creating a GIF...');
@@ -52,6 +52,6 @@ module.exports = class Renderer {
     await promisify(gif.write)('result.gif');
 
     for (let file of files) 
-      await fs.unlink(`frames/${file}`);
+      await promises.unlink(`frames/${file}`);
   }
 };
