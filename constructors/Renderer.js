@@ -13,7 +13,7 @@ module.exports = class Renderer {
     const cnv = new canvas.Canvas(this.width, this.height);
     const ctx = cnv.getContext('2d');
 
-    let { imageWidth, imageHeight, image } = this.app.GameLogic;
+    let { imageWidth, imageHeight, image, palette } = this.app.GameLogic;
 
     ctx.fillStyle = '#FFF';
     ctx.fillRect(0, 0, imageWidth, imageHeight);
@@ -21,10 +21,10 @@ module.exports = class Renderer {
     image.forEach((color, xy) => {
       let x = xy % imageWidth;
       let y = (xy - x) / imageWidth;
-      color = `rgb(${color.join(',')})`;
+      color = `rgb(${palette[color].join(',')})`;
 
       ctx.fillStyle = color;
-      ctx.fillRect(x, y, 16, 16);
+      ctx.fillRect(x * 16, y * 16, 16, 16);
     });
 
     let fileName = moment().format('MM-DD-YY');
