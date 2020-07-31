@@ -46,17 +46,14 @@ class BrowserEnviroment {
   }
 
   onResize() {
-    const vw = Math.max(
+    this.canvasElem.width = Math.max(
       document.documentElement.clientWidth || 0,
       window.innerWidth || 0
     );
-    const vh = Math.max(
+    this.canvasElem.height = Math.max(
       document.documentElement.clientHeight || 0,
       window.innerHeight || 0
     );
-
-    this.canvasElem.width = vw;
-    this.canvasElem.height = vh;
     this.renderImage();
   }
 
