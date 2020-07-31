@@ -1,6 +1,7 @@
 const ws = require('ws');
 const express = require('express');
 const http = require('http');
+const { resolve } = require('path');
 const { EventEmitter } = require('events');
 
 module.exports = class Web extends EventEmitter {
@@ -13,6 +14,11 @@ module.exports = class Web extends EventEmitter {
     this.express = express();
     this.httpServer = http.createServer(this.express);
     this.websocket = new ws.Server({ server: this.httpServer });
+
+    this.express.use(express.static('assets/static/'));
+    this.express.get('/', (_req, res) =>
+      res.sendFile(resolve(__dirname, '../assets/index.html'))
+    );
 
     this.websocket.on('connection', (ws) => this.onConnection(ws));
 

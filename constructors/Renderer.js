@@ -21,7 +21,7 @@ module.exports = class Renderer {
     image.forEach((color, xy) => {
       let x = xy % imageWidth;
       let y = (xy - x) / imageWidth;
-      color = `rgb(${color[0]},${color[1]},${color[2]})`;
+      color = `rgb(${color.join(',')})`;
 
       ctx.fillStyle = color;
       ctx.fillRect(x, y, 16, 16);
@@ -31,14 +31,17 @@ module.exports = class Renderer {
     let stream = cnv.createPNGStream();
 
     console.log(`Creating/overwriting a frame "${fileName}"...`);
-    
-    return stream.pipe(createWriteStream(`frames/frame_${fileName}.png`));
+
+    return stream.pipe(
+      createWriteStream(`assets/frames/frame_${fileName}.png`)
+    );
   }
 
   async renderGIF() {
-    let files = (await promises.readdir('frames'))
-      .sort(this.app.Utils.sortAlphaNum);
-    
+    let files = (await promises.readdir('frames')).sort(
+      this.app.Utils.sortAlphaNum
+    );
+
     console.log('Creating a GIF...');
 
     let gif = gm();
@@ -46,12 +49,11 @@ module.exports = class Renderer {
 
     for (let file of files) {
       if (file.indexOf('frame?') < 0) continue;
-      gif.in(`frames/${file}`);
+      gif.in(`assets/frames/${file}`);
     }
 
     await promisify(gif.write)('result.gif');
 
-    for (let file of files) 
-      await promises.unlink(`frames/${file}`);
+    for (let file of files) await promises.unlink(`assets/frames/${file}`);
   }
 };
