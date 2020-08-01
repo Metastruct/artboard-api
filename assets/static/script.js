@@ -96,7 +96,7 @@ class BrowserEnviroment {
         this.image = data.image;
         break;
       case 'addPixel':
-        this.image[data.y * this.imageWidth + data.x] = data.color;
+        this.image[data.xy] = data.color;
         console.log(data.steamId, 'placed a pixel at', data.x, data.y);
     }
 
