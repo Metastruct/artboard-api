@@ -6,7 +6,7 @@ class BrowserEnviroment {
     this.externalCanvas = document.querySelector('#external');
     this.canvasCtx = this.canvasElem.getContext('2d');
     this.externalCtx = this.externalCanvas.getContext('2d');
-    this.imageWidth = 160;
+    this.imageWidth = 320;
     this.imageHeight = 80;
     this.imageBlob = null;
     this.size = 10;
