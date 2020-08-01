@@ -9,7 +9,7 @@ module.exports = class GameLogic {
     this.paletteSettings = this.app.config.paletteSettings;
 
     this.image = [];
-    this.imageWidth = 160;
+    this.imageWidth = 320;
     this.imageHeight = 80;
     this.timeouts = {};
     this.timeoutTime = 3000;
