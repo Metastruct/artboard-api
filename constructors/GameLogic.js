@@ -35,8 +35,9 @@ module.exports = class GameLogic {
     if (timeout && Date.now() - timeout < this.timeoutTime) return;
     if (color > this.palette.length - 1 || color < 0) return;
 
-    this.image[y * this.imageWidth + x] = color;
-    this.app.Web.broadcast('addPixel', { x, y, color, steamId });
+    let xy = y * this.imageWidth + x;
+    this.image[xy] = color;
+    this.app.Web.broadcast('addPixel', { xy, color, steamId });
 
     this.timeouts[steamId] = Date.now();
   }
