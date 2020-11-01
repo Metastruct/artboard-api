@@ -2,25 +2,32 @@ const fs = require('fs');
 const FastIntegerCompression = require('fastintcompression');
 const cleanup = require('node-cleanup');
 const colorsys = require('colorsys');
+const Gfycat = require('gfycat-sdk');
 const moment = require('moment');
 
 module.exports = class GameLogic {
   constructor(app) {
     this.app = app;
-    this.paletteSettings = this.app.config.paletteSettings;
+
+    let { paletteSettings, giphyAPIKey } = this.app.config;
 
     this.image = [];
     this.imageWidth = 320;
     this.imageHeight = 80;
     this.timeouts = {};
     this.timeoutTime = 3000;
+    this.paletteSettings = paletteSettings;
+    this.gfycatAPI = new Gfycat(giphyAPIKey);
+    this.checkInterval = setInterval(() => this.dailyCheck(), 10000);
+  }
 
+  async initialize() {
     this.loadPalette();
     this.loadImage();
     this.bindWebsocketEvents();
-    this.checkInterval = setInterval(() => this.dailyCheck(), 10000);
 
     cleanup(() => this.saveImage());
+    await this.gfycatAPI.authenticate();
   }
 
   async dailyCheck() {
@@ -28,14 +35,41 @@ module.exports = class GameLogic {
 
     if (!fs.existsSync(`assets/frames/frame_${date}.png`))
       return this.app.Renderer.renderFrame();
-    
+
     let historyPath = `history/hi-${date}.dat`;
-    if (!fs.existsSync(historyPath) && this.image.length > 0) {
+    let day = new Date().getDate();
+    if (
+      !fs.existsSync(historyPath) &&
+      this.image.length > 0 &&
+      (day == 1 || day == 15)
+    ) {
       let compressed = FastIntegerCompression.compress(this.image);
       fs.writeFileSync(historyPath, Buffer.from(compressed));
-      
+
       await this.app.Renderer.renderGIF();
+      this.image = [];
+      this.app.Web.broadcast('imageReset');
+
+      return this.gfycatAPI.upload(
+        {
+          fetchUrl: `http://${this.app.config.host}/result.gif`,
+          title: 'Meta Construct Artboard Progress - ' + date,
+        },
+        (err, { gfyname }) => {
+          if (err) return;
+          this.uploading = gfyname;
+        }
+      );
     }
+
+    if (this.uploading)
+      this.gfycatAPI.checkUploadStatus(this.uploading, (err, { task }) => {
+        if (err) return;
+        if (task == 'complete') {
+          this.app.Web.broadcast('imageReset', this.uploading);
+          this.uploading = false;
+        }
+      });
   }
 
   bindWebsocketEvents() {
@@ -108,4 +142,6 @@ module.exports = class GameLogic {
     let compressed = FastIntegerCompression.compress(this.image);
     fs.writeFileSync('save.dat', Buffer.from(compressed));
   }
+
+  giphyUpload() {}
 };

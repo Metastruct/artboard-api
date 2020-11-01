@@ -7,5 +7,6 @@ module.exports = {
     colored: 23,
     gray: 9,
   },
-  giphyAPIKey: 'sex'
+  giphyAPIKey: 'sex',
+  host: 'threekelv.in:10010',
 };
