@@ -154,9 +154,10 @@ module.exports = class GameLogic {
       url: this.app.config.webhookUrl,
       data: {
         username: 'Artboard',
-        avatar_url: 'https://cdn.discordapp.com/attachments/769123705220759572/772548545114800159/avatar.png',
-        content: `https://gfycat.com/${gfyid}`
-      }
-    })
+        avatar_url:
+          'https://cdn.discordapp.com/attachments/769123705220759572/772548545114800159/avatar.png',
+        content: `https://gfycat.com/${gfyid}`,
+      },
+    });
   }
 };

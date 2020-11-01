@@ -38,8 +38,8 @@ module.exports = class Renderer {
   }
 
   async renderGIF() {
-    let files = (await promises.readdir('assets/frames/')).sort(
-      (e1, e2) => this.app.Utils.sortAlphaNum(e1, e2)
+    let files = (await promises.readdir('assets/frames/')).sort((e1, e2) =>
+      this.app.Utils.sortAlphaNum(e1, e2)
     );
 
     console.log('Creating a GIF...');
