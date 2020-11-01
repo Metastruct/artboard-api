@@ -10,13 +10,13 @@ module.exports = class Renderer {
   }
 
   renderFrame() {
-    const cnv = new canvas.Canvas(this.width, this.height);
-    const ctx = cnv.getContext('2d');
-
     let { imageWidth, imageHeight, image, palette } = this.app.GameLogic;
 
+    const cnv = new canvas.Canvas(imageWidth * 16, imageHeight * 16);
+    const ctx = cnv.getContext('2d');
+
     ctx.fillStyle = '#FFF';
-    ctx.fillRect(0, 0, imageWidth, imageHeight);
+    ctx.fillRect(0, 0, imageWidth * 16, imageHeight * 16);
 
     image.forEach((color, xy) => {
       let x = xy % imageWidth;
@@ -32,9 +32,10 @@ module.exports = class Renderer {
 
     console.log(`Creating/overwriting a frame "${fileName}"...`);
 
-    return stream.pipe(
-      createWriteStream(`assets/frames/frame_${fileName}.png`)
-    );
+    const out = createWriteStream(`assets/frames/frame_${fileName}.png`);
+    out.on('finish', () =>  console.log('The PNG file was created.'))
+
+    return stream.pipe(out);
   }
 
   async renderGIF() {

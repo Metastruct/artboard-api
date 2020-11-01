@@ -144,6 +144,4 @@ module.exports = class GameLogic {
     let compressed = FastIntegerCompression.compress(this.image);
     fs.writeFileSync('save.dat', Buffer.from(compressed));
   }
-
-  giphyUpload() {}
 };
