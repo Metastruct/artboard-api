@@ -41,7 +41,6 @@ module.exports = class Renderer {
     let files = (await promises.readdir('assets/frames/')).sort(
       (e1, e2) => this.app.Utils.sortAlphaNum(e1, e2)
     );
-    console.log(files);
 
     console.log('Creating a GIF...');
 
@@ -49,8 +48,7 @@ module.exports = class Renderer {
     gif.delay(100);
 
     for (let file of files) {
-      if (file.indexOf('frame?') < 0) continue;
-      console.log(file);
+      if (!file.startsWith('frame_')) continue;
       gif.in(`assets/frames/${file}`);
     }
 

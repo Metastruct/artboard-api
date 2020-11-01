@@ -59,7 +59,7 @@ module.exports = class GameLogic {
           title: 'Meta Construct Artboard Progress - ' + date,
         },
         (err, { gfyname }) => {
-          if (err) return;
+          if (err) return console.error(err);
           this.uploading = gfyname;
         }
       );
@@ -67,7 +67,7 @@ module.exports = class GameLogic {
 
     if (this.uploading)
       this.gfycatAPI.checkUploadStatus(this.uploading, (err, { task }) => {
-        if (err) return;
+        if (err) return console.error(err);
         if (task == 'complete') {
           this.executeWebhook(this.uploading);
           this.uploading = false;
@@ -137,6 +137,8 @@ module.exports = class GameLogic {
       console.log('Image load failed.', err);
       this.createImage();
     }
+
+    if (this.image.length == 0) this.createImage();
   }
 
   saveImage() {
@@ -147,7 +149,7 @@ module.exports = class GameLogic {
   }
 
   executeWebhook(gfyid) {
-    axios({
+    return axios({
       method: 'post',
       url: this.app.config.webhookUrl,
       data: {
