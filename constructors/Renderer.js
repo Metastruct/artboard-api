@@ -2,7 +2,6 @@ const canvas = require('canvas');
 const { promises, createWriteStream } = require('fs');
 const gm = require('gm');
 const moment = require('moment');
-const { promisify } = require('util');
 
 module.exports = class Renderer {
   constructor(app) {
@@ -39,7 +38,7 @@ module.exports = class Renderer {
   }
 
   async renderGIF() {
-    let files = (await promises.readdir('assets/frames')).sort(
+    let files = (await promises.readdir('assets/frames/')).sort(
       (e1, e2) => this.app.Utils.sortAlphaNum(e1, e2)
     );
 
@@ -50,6 +49,7 @@ module.exports = class Renderer {
 
     for (let file of files) {
       if (file.indexOf('frame?') < 0) continue;
+      gif.in(`assets/frames/${file}`);
       gif.in(`assets/frames/${file}`);
     }
 
