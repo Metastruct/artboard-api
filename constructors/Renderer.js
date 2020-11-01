@@ -54,7 +54,7 @@ module.exports = class Renderer {
     }
 
     await new Promise((res, rej) => {
-      img.write('assets/static/result.gif', (err) => {
+      gif.write('assets/static/result.gif', (err) => {
         if (err) rej(err);
         res();
       });
