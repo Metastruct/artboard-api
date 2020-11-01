@@ -33,7 +33,7 @@ module.exports = class Renderer {
     console.log(`Creating/overwriting a frame "${fileName}"...`);
 
     const out = createWriteStream(`assets/frames/frame_${fileName}.png`);
-    out.on('finish', () =>  console.log('The PNG file was created.'))
+    out.on('finish', () => console.log('The PNG file was created.'));
 
     return stream.pipe(out);
   }
@@ -53,7 +53,12 @@ module.exports = class Renderer {
       gif.in(`assets/frames/${file}`);
     }
 
-    await promisify(gif.write)('assets/static/result.gif');
+    await new Promise((res, rej) => {
+      img.write('assets/static/result.gif', (err) => {
+        if (err) rej(err);
+        res();
+      });
+    });
 
     for (let file of files) await promises.unlink(`assets/frames/${file}`);
   }
