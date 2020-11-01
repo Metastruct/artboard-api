@@ -3,6 +3,7 @@ const FastIntegerCompression = require('fastintcompression');
 const cleanup = require('node-cleanup');
 const colorsys = require('colorsys');
 const Gfycat = require('gfycat-sdk');
+const axios = require('axios');
 const moment = require('moment');
 
 module.exports = class GameLogic {
@@ -68,7 +69,7 @@ module.exports = class GameLogic {
       this.gfycatAPI.checkUploadStatus(this.uploading, (err, { task }) => {
         if (err) return;
         if (task == 'complete') {
-          this.app.Web.broadcast('twitterUpl', this.uploading);
+          this.executeWebhook(this.uploading);
           this.uploading = false;
         }
       });
@@ -143,5 +144,17 @@ module.exports = class GameLogic {
 
     let compressed = FastIntegerCompression.compress(this.image);
     fs.writeFileSync('save.dat', Buffer.from(compressed));
+  }
+
+  executeWebhook(gfyid) {
+    axios({
+      method: 'post',
+      url: this.app.config.webhookUrl,
+      data: {
+        username: 'Artboard',
+        avatar_url: 'https://cdn.discordapp.com/attachments/769123705220759572/772548545114800159/avatar.png',
+        content: `https://gfycat.com/${gfyid}`
+      }
+    })
   }
 };
