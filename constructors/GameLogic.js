@@ -19,6 +19,8 @@ module.exports = class GameLogic {
     this.paletteSettings = paletteSettings;
     this.gfycatAPI = new Gfycat(giphyAPIKey);
     this.checkInterval = setInterval(() => this.dailyCheck(), 10000);
+
+    this.initialize();
   }
 
   async initialize() {
