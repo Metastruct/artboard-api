@@ -2,6 +2,7 @@ const fs = require('fs');
 const FastIntegerCompression = require('fastintcompression');
 const cleanup = require('node-cleanup');
 const colorsys = require('colorsys');
+const moment = require('moment');
 
 module.exports = class GameLogic {
   constructor(app) {
@@ -17,8 +18,24 @@ module.exports = class GameLogic {
     this.loadPalette();
     this.loadImage();
     this.bindWebsocketEvents();
+    this.checkInterval = setInterval(() => this.dailyCheck(), 10000);
 
     cleanup(() => this.saveImage());
+  }
+
+  async dailyCheck() {
+    let date = moment().format('MM-DD-YY');
+
+    if (!fs.existsSync(`assets/frames/frame_${date}.png`))
+      return this.app.Renderer.renderFrame();
+    
+    let historyPath = `history/hi-${date}.dat`;
+    if (!fs.existsSync(historyPath) && this.image.length > 0) {
+      let compressed = FastIntegerCompression.compress(this.image);
+      fs.writeFileSync(historyPath, Buffer.from(compressed));
+      
+      await this.app.Renderer.renderGIF();
+    }
   }
 
   bindWebsocketEvents() {
