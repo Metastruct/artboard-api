@@ -48,8 +48,7 @@ module.exports = class Renderer {
     gif.delay(100);
 
     for (let file of files) {
-      if (file.indexOf('frame?') < 0) continue;
-      console.log(file);
+      if (file.indexOf('frame?') <= 0) continue;
       gif.in(`assets/frames/${file}`);
     }
 
