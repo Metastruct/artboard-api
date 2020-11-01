@@ -66,7 +66,7 @@ module.exports = class GameLogic {
       this.gfycatAPI.checkUploadStatus(this.uploading, (err, { task }) => {
         if (err) return;
         if (task == 'complete') {
-          this.app.Web.broadcast('imageReset', this.uploading);
+          this.app.Web.broadcast('twitterUpl', this.uploading);
           this.uploading = false;
         }
       });
