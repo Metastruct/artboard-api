@@ -52,7 +52,7 @@ module.exports = class Renderer {
       gif.in(`assets/frames/${file}`);
     }
 
-    await promisify(gif.write)('result.gif');
+    await promisify(gif.write)('assets/static/result.gif');
 
     for (let file of files) await promises.unlink(`assets/frames/${file}`);
   }
