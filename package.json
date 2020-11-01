@@ -18,6 +18,7 @@
   },
   "homepage": "https://gitlab.com/metastruct/pixels-web-api#readme",
   "dependencies": {
+    "axios": "^0.21.0",
     "canvas": "^2.6.1",
     "colorsys": "^1.0.22",
     "express": "^4.17.1",
