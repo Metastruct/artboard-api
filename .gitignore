@@ -1,3 +1,7 @@
 node_modules/
 config.js
 save.dat
+!history/hi-11-01-20.dat
+history/*.dat
+assets/frames/*.png
+assets/static/result.gif
