@@ -1,6 +1,6 @@
 const canvas = require('canvas');
 const { promises, createWriteStream } = require('fs');
-const gm = require('gm');
+const gm = require('gm').subClass({ imageMagick: true });
 const moment = require('moment');
 
 module.exports = class Renderer {
