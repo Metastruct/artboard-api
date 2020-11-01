@@ -1,6 +1,6 @@
 const canvas = require('canvas');
 const { promises, createWriteStream } = require('fs');
-const gm = require('gm').subClass({ imageMagick: true });
+const gm = require('gm');
 const moment = require('moment');
 
 module.exports = class Renderer {
@@ -49,7 +49,6 @@ module.exports = class Renderer {
 
     for (let file of files) {
       if (file.indexOf('frame?') < 0) continue;
-      gif.in(`assets/frames/${file}`);
       gif.in(`assets/frames/${file}`);
     }
 
