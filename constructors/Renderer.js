@@ -50,6 +50,7 @@ module.exports = class Renderer {
 
     for (let file of files) {
       if (file.indexOf('frame?') < 0) continue;
+      console.log(file);
       gif.in(`assets/frames/${file}`);
     }
 
