@@ -20,7 +20,8 @@ module.exports = class Renderer {
     image.forEach((color, xy) => {
       let x = xy % imageWidth;
       let y = (xy - x) / imageWidth;
-      color = `rgb(${palette[color].join(',')})`;
+      let rgb = palette[color] || [ 255, 255, 255 ];
+      color = `rgb(${rgb.join(',')})`;
 
       ctx.fillStyle = color;
       ctx.fillRect(x * 16, y * 16, 16, 16);

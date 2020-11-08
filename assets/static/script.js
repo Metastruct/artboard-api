@@ -141,7 +141,8 @@ class BrowserEnviroment {
       const x = xy % this.imageWidth;
       const y = (xy - x) / this.imageWidth;
 
-      this.externalCtx.fillStyle = `rgb(${this.palette[color].join(',')})`;
+      let rgb = this.palette[color] || [ 255, 255, 255 ];
+      this.externalCtx.fillStyle = `rgb(${rgb.join(',')})`;
       this.externalCtx.fillRect(x, y, 1, 1);
     });
 
