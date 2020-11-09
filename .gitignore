@@ -5,3 +5,4 @@ save.dat
 history/*.dat
 assets/frames/*.png
 assets/static/result.gif
+assets/static/script.js
