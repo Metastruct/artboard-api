@@ -43,9 +43,19 @@ class BrowserEnviroment {
         this.oldMouseCoords = [e.clientX, e.clientY];
       }
     });
-    window.addEventListener('wheel', (e) => {
-      const size = this.size + e.deltaY * -0.1;
-      if (size > 0.2) this.size = size;
+    window.addEventListener('wheel', ({ x, y, deltaY }) => {
+      const { width, height } = this.canvasElem;
+
+      const direction = deltaY > 0 ? -1 : 1;
+      const size = direction * 0.5;
+      if ((this.size + size) <= 0.2) return;
+
+      const wx = (x - this.offsetCoords[0]) / (width * this.size);
+      const wy = (y - this.offsetCoords[1]) / (height * this.size);
+
+      this.offsetCoords[0] -= wx * width * size;
+      this.offsetCoords[1] -= wy * height * size;
+      this.size += size;
     });
 
     window.requestAnimationFrame(() => this.renderCanvas());
@@ -102,7 +112,7 @@ class BrowserEnviroment {
     const msg = /** @type {WSMessage} */ JSON.parse(received);
     const { op, data } = msg;
 
-    switch (msg.op) {
+    switch (op) {
       case 'imageInfo':
         const { palette, image } = /** @type {ImageInfo} */ data;
         this.palette = palette;
@@ -119,20 +129,23 @@ class BrowserEnviroment {
 
   renderCanvas() {
     if (this.imageBlob) {
+      this.canvasCtx.save();
       const { width, height } = this.canvasElem;
       this.canvasCtx.clearRect(0, 0, width, height);
       this.canvasCtx.imageSmoothingEnabled = false;
 
-      const x = (width - this.imageWidth * this.size) / 2;
-      const y = (height - this.imageHeight * this.size) / 2;
+      this.canvasCtx.translate(this.offsetCoords[0], this.offsetCoords[1]);
+      this.canvasCtx.scale(this.size, this.size);
 
       this.canvasCtx.drawImage(
         this.imageBlob,
-        this.offsetCoords[0] + x,
-        this.offsetCoords[1] + y,
-        this.imageWidth * this.size,
-        this.imageHeight * this.size
+        0,
+        0,
+        this.imageWidth,
+        this.imageHeight
       );
+
+      this.canvasCtx.restore();
     }
 
     window.requestAnimationFrame(() => this.renderCanvas());
