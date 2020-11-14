@@ -88,7 +88,7 @@ module.exports = class GameLogic {
   addPixel(x, y, color, steamId) {
     let timeout = this.timeouts[steamId];
     if (timeout && Date.now() - timeout < this.timeoutTime) return;
-    if (color > this.palette.length - 1 || color < 0) return;
+    if (color >= this.palette.length || color < 0) return;
 
     let xy = y * this.imageWidth + x;
     this.image[xy] = color;
