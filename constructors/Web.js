@@ -36,15 +36,16 @@ module.exports = class Web extends EventEmitter {
   async handleSteamRequest(req, res) {
     const id = req.params.id;
 
-    if (this.sIDCache[id])
-      return res.send(this.sIDCache[req.params.id]);
+    if (this.sIDCache[id]) return res.send(this.sIDCache[req.params.id]);
 
-    let { data } = await axios(`https://steamcommunity.com/profiles/${id}?xml=1`);
+    let { data } = await axios(
+      `https://steamcommunity.com/profiles/${id}?xml=1`
+    );
     data = await parseStringPromise(data);
-    data = { 
+    data = {
       nickname: data.profile.steamID[0],
-      avatar: data.profile.avatarMedium[0]
-    }
+      avatar: data.profile.avatarMedium[0],
+    };
 
     this.sIDCache[id] = data;
     res.send(data);

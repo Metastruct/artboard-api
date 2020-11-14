@@ -8,7 +8,7 @@ class BrowserEnviroment {
     this.errorElem = document.querySelector('.error');
     this.infoElem = document.querySelector('.info');
     this.avatarElem = document.querySelector('.avatar');
-    this.nicknameElem = document.querySelector('.nickname')
+    this.nicknameElem = document.querySelector('.nickname');
     this.canvasElem = document.querySelector('#canvas');
     this.externalCanvas = document.querySelector('#external');
     this.canvasCtx = this.canvasElem.getContext('2d');
@@ -33,13 +33,16 @@ class BrowserEnviroment {
 
   setupWindowEvents() {
     window.addEventListener('resize', () => this.onResize());
-    this.canvasElem.addEventListener('mouseup', () => (this.isDragging = false));
+    this.canvasElem.addEventListener(
+      'mouseup',
+      () => (this.isDragging = false)
+    );
     this.canvasElem.addEventListener('mousedown', (e) => {
       this.isDragging = true;
       this.oldMouseCoords = [e.clientX, e.clientY];
     });
     this.canvasElem.addEventListener('mousemove', (e) => {
-      this.mouseCoords = [ e.clientX, e.clientY ];
+      this.mouseCoords = [e.clientX, e.clientY];
       if (this.isDragging) {
         const dx = e.clientX - this.oldMouseCoords[0],
           dy = e.clientY - this.oldMouseCoords[1];
@@ -55,7 +58,7 @@ class BrowserEnviroment {
 
       const direction = deltaY > 0 ? -1 : 1;
       const size = direction * 0.5;
-      if ((this.size + size) <= 0.2) return;
+      if (this.size + size <= 0.2) return;
 
       const wx = (x - this.offsetCoords[0]) / (width * this.size);
       const wy = (y - this.offsetCoords[1]) / (height * this.size);
@@ -72,7 +75,7 @@ class BrowserEnviroment {
     if (this.cache[sid]) return this.cache[sid];
     this.cache[sid] = true;
 
-    let xhr = new XMLHttpRequest;
+    let xhr = new XMLHttpRequest();
     xhr.open('GET', `http://${document.location.host}/get/${sid}`);
     xhr.send();
     xhr.onload = () => {
@@ -178,16 +181,16 @@ class BrowserEnviroment {
   }
 
   update() {
-    const { infoElem,
+    const {
+      infoElem,
       mouseCoords,
       offsetCoords,
       nicknameElem,
-      avatarElem
-    } = this
+      avatarElem,
+    } = this;
 
     const elem = document.elementFromPoint(mouseCoords[0], mouseCoords[1]);
-    if (elem == infoElem &&
-      infoElem.className.indexOf('hidden') < 0) return;
+    if (elem == infoElem && infoElem.className.indexOf('hidden') < 0) return;
 
     const mx = Math.floor((mouseCoords[0] - offsetCoords[0]) / this.size),
       my = Math.floor((mouseCoords[1] - offsetCoords[1]) / this.size);
@@ -201,13 +204,12 @@ class BrowserEnviroment {
       infoElem.style.left = offsetCoords[0] + mx * this.size + 'px';
 
       nicknameElem.innerHTML = res.nickname;
-      nicknameElem.href = `https://steamcommunity.com/profiles/${steamId}`
+      nicknameElem.href = `https://steamcommunity.com/profiles/${steamId}`;
       avatarElem.src = res.avatar;
       try {
         avatarElem.load();
       } catch (err) {}
-    } else
-      this.infoElem.classList.add('hidden');
+    } else this.infoElem.classList.add('hidden');
   }
 
   renderImage() {
