@@ -28,11 +28,13 @@ body {
 }
 
 .error {
-  background: rgba(0, 0, 0, .15);
-  color: black;
-  padding: 2em;
+  background: rgba(0, 0, 0, 0.55);
+  color: #e3e3e3;
+  padding: 1em;
   position: fixed;
   width: 100%;
+  bottom: 0;
+  text-align: center;
 }
 
 .hidden {
