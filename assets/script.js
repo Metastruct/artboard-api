@@ -6,19 +6,24 @@
 class BrowserEnviroment {
   constructor() {
     this.errorElem = document.querySelector('.error');
+    this.infoElem = document.querySelector('.info');
+    this.avatarElem = document.querySelector('.avatar');
+    this.nicknameElem = document.querySelector('.nickname')
     this.canvasElem = document.querySelector('#canvas');
     this.externalCanvas = document.querySelector('#external');
     this.canvasCtx = this.canvasElem.getContext('2d');
     this.externalCtx = this.externalCanvas.getContext('2d');
+    this.palette = null;
+    this.image = null;
     this.imageWidth = 320;
     this.imageHeight = 80;
     this.imageBlob = null;
     this.size = 10;
-    this.offsetCoords = [0, 0];
-    this.oldMouseCoords = [0, 0];
     this.isDragging = false;
-    this.palette = null;
-    this.image = null;
+    this.offsetCoords = [0, 0];
+    this.mouseCoords = [0, 0];
+    this.oldMouseCoords = [0, 0];
+    this.cache = {};
 
     this.onResize();
     this.openConnection();
@@ -27,12 +32,13 @@ class BrowserEnviroment {
 
   setupWindowEvents() {
     window.addEventListener('resize', () => this.onResize());
-    window.addEventListener('mouseup', () => (this.isDragging = false));
-    window.addEventListener('mousedown', (e) => {
+    this.canvasElem.addEventListener('mouseup', () => (this.isDragging = false));
+    this.canvasElem.addEventListener('mousedown', (e) => {
       this.isDragging = true;
       this.oldMouseCoords = [e.clientX, e.clientY];
     });
-    window.addEventListener('mousemove', (e) => {
+    this.canvasElem.addEventListener('mousemove', (e) => {
+      this.mouseCoords = [ e.clientX, e.clientY ];
       if (this.isDragging) {
         const dx = e.clientX - this.oldMouseCoords[0],
           dy = e.clientY - this.oldMouseCoords[1];
@@ -43,7 +49,7 @@ class BrowserEnviroment {
         this.oldMouseCoords = [e.clientX, e.clientY];
       }
     });
-    window.addEventListener('wheel', ({ x, y, deltaY }) => {
+    this.canvasElem.addEventListener('wheel', ({ x, y, deltaY }) => {
       const { width, height } = this.canvasElem;
 
       const direction = deltaY > 0 ? -1 : 1;
@@ -59,6 +65,21 @@ class BrowserEnviroment {
     });
 
     window.requestAnimationFrame(() => this.renderCanvas());
+  }
+
+  getSteamNameAvatar(sid) {
+    if (this.cache[sid]) return this.cache[sid];
+    this.cache[sid] = true;
+
+    let xhr = new XMLHttpRequest;
+    xhr.open('GET', `http://${document.location.host}/get/${sid}`);
+    xhr.send();
+    xhr.onload = () => {
+      if (xml.readyState == xml.DONE && xml.status == 200)
+        this.cache[sid] = JSON.parse(xml.responseText);
+    };
+
+    return true;
   }
 
   onResize() {
@@ -114,9 +135,10 @@ class BrowserEnviroment {
 
     switch (op) {
       case 'imageInfo':
-        const { palette, image } = /** @type {ImageInfo} */ data;
+        const { palette, image, steamIDs } = /** @type {ImageInfo} */ data;
         this.palette = palette;
         this.image = image;
+        this.steamIDs = steamIDs;
         break;
       case 'addPixel':
         const { xy, color, steamId } = /** @type {AddPixel} */ data;
@@ -129,7 +151,9 @@ class BrowserEnviroment {
 
   renderCanvas() {
     if (this.imageBlob) {
+      this.update();
       this.canvasCtx.save();
+
       const { width, height } = this.canvasElem;
       this.canvasCtx.clearRect(0, 0, width, height);
       this.canvasCtx.imageSmoothingEnabled = false;
@@ -149,6 +173,39 @@ class BrowserEnviroment {
     }
 
     window.requestAnimationFrame(() => this.renderCanvas());
+  }
+
+  update() {
+    const { infoElem,
+      mouseCoords,
+      offsetCoords,
+      nicknameElem,
+      avatarElem
+    } = this
+
+    const elem = document.elementFromPoint(mouseCoords[0], mouseCoords[1]);
+    if (elem == infoElem &&
+      infoElem.className.indexOf('hidden') < 0) return;
+
+    const mx = Math.floor((mouseCoords[0] - offsetCoords[0]) / this.size),
+      my = Math.floor((mouseCoords[1] - offsetCoords[1]) / this.size);
+    const xy = my * this.imageWidth + mx;
+    const steamId = this.steamIDs[xy];
+    if (steamId) {
+      const res = this.getSteamNameAvatar(steamId);
+
+      infoElem.classList.remove('hidden');
+      infoElem.style.top = offsetCoords[1] + my * this.size + 'px';
+      infoElem.style.left = offsetCoords[0] + mx * this.size + 'px';
+
+      nicknameElem.innerHTML = res.nickname;
+      nicknameElem.href = `https://steamcommunity.com/profiles/${steamId}`
+      avatarElem.src = res.avatar;
+      try {
+        avatarElem.load();
+      } catch (err) {}
+    } else
+      this.infoElem.classList.add('hidden');
   }
 
   renderImage() {

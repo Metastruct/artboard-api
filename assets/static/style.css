@@ -40,3 +40,23 @@ body {
 .hidden {
   display: none;
 }
+
+.info {
+  background: rgba(0, 0, 0, .75);
+  color: #BFBFBF;
+  border: 1px solid black;
+  position: fixed;
+  padding: 1em;
+  transform: translate(-50%, -100%);
+  text-align: center;
+}
+
+.avatar {
+  border-radius: 50%;
+}
+
+.nickname {
+  display: block;
+  color: #BFBFBF;
+  text-decoration: none;
+}
