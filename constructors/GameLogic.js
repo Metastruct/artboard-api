@@ -16,6 +16,7 @@ module.exports = class GameLogic {
     this.steamIDs = [];
     this.imageWidth = 320;
     this.imageHeight = 80;
+    this.banned = {};
     this.timeouts = {};
     this.timeoutTime = 3000;
     this.paletteSettings = paletteSettings;
@@ -89,6 +90,7 @@ module.exports = class GameLogic {
     let timeout = this.timeouts[steamId];
     if (timeout && Date.now() - timeout < this.timeoutTime) return;
     if (color >= this.palette.length || color < 0) return;
+    if (this.banned[steamId]) return;
 
     let xy = y * this.imageWidth + x;
     this.image[xy] = color;
