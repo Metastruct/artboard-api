@@ -42,8 +42,8 @@ module.exports = class Web extends EventEmitter {
     let { data } = await axios(`https://steamcommunity.com/profiles/${id}?xml=1`);
     data = await parseStringPromise(data);
     data = { 
-      nickname: data.profile.steamID,
-      avatar: data.profile.avatarMedium
+      nickname: data.profile.steamID[0],
+      avatar: data.profile.avatarMedium[0]
     }
 
     this.sIDCache[id] = data;
