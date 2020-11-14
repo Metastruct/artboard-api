@@ -33,15 +33,15 @@ class BrowserEnviroment {
 
   setupWindowEvents() {
     window.addEventListener('resize', () => this.onResize());
-    this.canvasElem.addEventListener(
+    window.addEventListener(
       'mouseup',
       () => (this.isDragging = false)
     );
-    this.canvasElem.addEventListener('mousedown', (e) => {
+    window.addEventListener('mousedown', (e) => {
       this.isDragging = true;
       this.oldMouseCoords = [e.clientX, e.clientY];
     });
-    this.canvasElem.addEventListener('mousemove', (e) => {
+    window.addEventListener('mousemove', (e) => {
       this.mouseCoords = [e.clientX, e.clientY];
       if (this.isDragging) {
         const dx = e.clientX - this.oldMouseCoords[0],
@@ -53,7 +53,7 @@ class BrowserEnviroment {
         this.oldMouseCoords = [e.clientX, e.clientY];
       }
     });
-    this.canvasElem.addEventListener('wheel', ({ x, y, deltaY }) => {
+    window.addEventListener('wheel', ({ x, y, deltaY }) => {
       const { width, height } = this.canvasElem;
 
       const direction = deltaY > 0 ? -1 : 1;
