@@ -3,6 +3,7 @@ body {
   overflow: hidden;
   font-size: 18px;
   font-family: sans-serif;
+  background: url(/darknoise.png);
 }
 
 #canvas {
@@ -21,13 +22,17 @@ body {
   opacity: 0;
 }
 
+.overlay {
+  position: fixed;
+  z-index: 999;
+}
+
 .error {
   background: rgba(0, 0, 0, .15);
   color: black;
   padding: 2em;
   position: fixed;
   width: 100%;
-  z-index: 999;
 }
 
 .hidden {
