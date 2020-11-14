@@ -13,6 +13,7 @@ module.exports = class GameLogic {
     let { paletteSettings, giphyAPIKey } = this.app.config;
 
     this.image = [];
+    this.steamIDs = [];
     this.imageWidth = 320;
     this.imageHeight = 80;
     this.timeouts = {};
@@ -91,6 +92,7 @@ module.exports = class GameLogic {
 
     let xy = y * this.imageWidth + x;
     this.image[xy] = color;
+    this.steamIDs[xy] = steamId;
     this.app.Web.broadcast('addPixel', { xy, color, steamId });
 
     this.timeouts[steamId] = Date.now();
