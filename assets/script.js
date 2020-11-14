@@ -14,6 +14,7 @@ class BrowserEnviroment {
     this.canvasCtx = this.canvasElem.getContext('2d');
     this.externalCtx = this.externalCanvas.getContext('2d');
     this.palette = null;
+    this.steamIDs = {};
     this.image = null;
     this.imageWidth = 320;
     this.imageHeight = 80;
@@ -143,6 +144,7 @@ class BrowserEnviroment {
       case 'addPixel':
         const { xy, color, steamId } = /** @type {AddPixel} */ data;
         this.image[xy] = color;
+        this.steamIDs[xy] = steamId;
         console.log(steamId, 'placed a pixel at', xy);
     }
 
