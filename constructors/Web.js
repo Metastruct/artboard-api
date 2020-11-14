@@ -4,6 +4,7 @@ const http = require('http');
 const { resolve } = require('path');
 const { EventEmitter } = require('events');
 const axios = require('axios');
+const { parseStringPromise } = require('xml2js');
 
 module.exports = class Web extends EventEmitter {
   constructor(app) {
@@ -38,7 +39,15 @@ module.exports = class Web extends EventEmitter {
     if (this.sIDCache[id])
       return res.send(this.sIDCache[req.params.id]);
 
-    const { data } = await axios(`https://steamcommunity.com/profiles/${id}?xml=1`);
+    let { data } = await axios(`https://steamcommunity.com/profiles/${id}?xml=1`);
+    data = await parseStringPromise(data);
+    data = { 
+      nickname: data.profile.steamID,
+      avatar: data.profile.avatarMedium
+    }
+
+    this.sIDCache[id] = data;
+    res.send(data);
   }
 
   send(ws, op, data) {
