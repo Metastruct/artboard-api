@@ -42,7 +42,6 @@ class BrowserEnviroment {
       this.oldMouseCoords = [e.clientX, e.clientY];
     });
     window.addEventListener('mousemove', (e) => {
-      this.mouseCoords = [e.clientX, e.clientY];
       if (this.isDragging) {
         const dx = e.clientX - this.oldMouseCoords[0],
           dy = e.clientY - this.oldMouseCoords[1];
@@ -67,6 +66,9 @@ class BrowserEnviroment {
       this.offsetCoords[1] -= wy * height * size;
       this.size += size;
     });
+    this.canvasElem.addEventListener('mousemove',
+      (e) => (this.mouseCoords = [e.clientX, e.clientY])
+    );
 
     window.requestAnimationFrame(() => this.renderCanvas());
   }
