@@ -73,7 +73,7 @@ class BrowserEnviroment {
 
   getSteamNameAvatar(sid) {
     if (this.cache[sid]) return this.cache[sid];
-    this.cache[sid] = true;
+    this.cache[sid] = { avatar: '', nickname: 'loading...' };
 
     let xhr = new XMLHttpRequest();
     xhr.open('GET', `http://${document.location.host}/get/${sid}`);
@@ -83,7 +83,7 @@ class BrowserEnviroment {
         this.cache[sid] = JSON.parse(xhr.responseText);
     };
 
-    return true;
+    return this.cache[sid];
   }
 
   onResize() {
@@ -197,7 +197,7 @@ class BrowserEnviroment {
     const xy = my * this.imageWidth + mx;
     const steamId = this.steamIDs[xy];
     if (steamId) {
-      const res = this.getSteamNameAvatar(steamId);
+      const res = this.getSteamNameAvatar(steamId) /** @type {SteamResponse} */;
 
       infoElem.classList.remove('hidden');
       infoElem.style.top = offsetCoords[1] + my * this.size + 'px';

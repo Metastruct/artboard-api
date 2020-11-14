@@ -22,3 +22,10 @@ AddPixel.prototype.color;
 AddPixel.prototype.xy;
 /** @type {string} */
 AddPixel.prototype.steamId;
+
+/** @interface */
+function SteamResponse() {}
+/** @type {string} */
+SteamResponse.prototype.nickname;
+/** @type {string} */
+SteamResponse.prototype.avatar;
