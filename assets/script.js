@@ -75,8 +75,8 @@ class BrowserEnviroment {
     xhr.open('GET', `http://${document.location.host}/get/${sid}`);
     xhr.send();
     xhr.onload = () => {
-      if (xml.readyState == xml.DONE && xml.status == 200)
-        this.cache[sid] = JSON.parse(xml.responseText);
+      if (xhr.readyState == xhr.DONE && xhr.status == 200)
+        this.cache[sid] = JSON.parse(xhr.responseText);
     };
 
     return true;
