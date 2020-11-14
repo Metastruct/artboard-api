@@ -102,7 +102,7 @@ class BrowserEnviroment {
 
   openConnection(i = 0) {
     /** @suppress {checkTypes} */
-    this.ws = new WebSocket(`ws://${document.location.host}/`);
+    this.ws = new WebSocket(`ws://threekelv.in/`);
 
     this.ws.addEventListener('error', (e) => {
       this.error(true, 'Error occurred!');
