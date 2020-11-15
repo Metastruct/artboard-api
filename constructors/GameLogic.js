@@ -2,7 +2,7 @@ const fs = require('fs');
 const FastIntegerCompression = require('fastintcompression');
 const cleanup = require('node-cleanup');
 const colorsys = require('colorsys');
-const Gfycat = require('gfycat-sdk');
+const FormData = require('form-data');
 const axios = require('axios');
 const moment = require('moment');
 
@@ -10,7 +10,7 @@ module.exports = class GameLogic {
   constructor(app) {
     this.app = app;
 
-    let { paletteSettings, giphyAPIKey } = this.app.config;
+    let { paletteSettings } = this.app.config;
 
     this.image = [];
     this.steamIDs = [];
@@ -20,7 +20,6 @@ module.exports = class GameLogic {
     this.timeouts = {};
     this.timeoutTime = 3000;
     this.paletteSettings = paletteSettings;
-    this.gfycatAPI = new Gfycat(giphyAPIKey);
     this.checkInterval = setInterval(() => this.dailyCheck(), 10000);
 
     this.initialize();
@@ -32,7 +31,6 @@ module.exports = class GameLogic {
     this.bindWebsocketEvents();
 
     cleanup(() => this.saveImage());
-    await this.gfycatAPI.authenticate();
   }
 
   async dailyCheck() {
@@ -54,27 +52,8 @@ module.exports = class GameLogic {
       await this.app.Renderer.renderGIF();
       this.image = [];
       this.app.Web.broadcast('imageReset');
-
-      return this.gfycatAPI.upload(
-        {
-          fetchUrl: `http://${this.app.config.host}/result.gif`,
-          title: 'Meta Construct Artboard Progress - ' + date,
-        },
-        (err, { gfyname }) => {
-          if (err) return console.error(err);
-          this.uploading = gfyname;
-        }
-      );
+      this.executeWebhook();
     }
-
-    if (this.uploading)
-      this.gfycatAPI.checkUploadStatus(this.uploading, (err, { task }) => {
-        if (err) return console.error(err);
-        if (task == 'complete') {
-          this.executeWebhook(this.uploading);
-          this.uploading = false;
-        }
-      });
   }
 
   bindWebsocketEvents() {
@@ -152,16 +131,12 @@ module.exports = class GameLogic {
     fs.writeFileSync('save.dat', Buffer.from(compressed));
   }
 
-  executeWebhook(gfyid) {
-    return axios({
-      method: 'post',
-      url: this.app.config.webhookUrl,
-      data: {
-        username: 'Artboard',
-        avatar_url:
-          'https://cdn.discordapp.com/attachments/769123705220759572/772548545114800159/avatar.png',
-        content: `https://gfycat.com/${gfyid}`,
-      },
-    });
+  executeWebhook() {
+    const formData = new FormData();
+    formData.append('username', 'Artboard');
+    formData.append('avatar_url', 'https://cdn.discordapp.com/attachments/769123705220759572/772548545114800159/avatar.png');
+    formData.append('file', fs.createReadStream('assets/static/result.gif'));
+
+    return formData.submit(this.app.config.webhookUrl);
   }
 };
