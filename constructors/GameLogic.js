@@ -16,6 +16,7 @@ module.exports = class GameLogic {
     this.imageWidth = 320;
     this.imageHeight = 80;
     this.banned = {
+      // Drew nazi symbol and left immediately after being exposed
       '76561198278692738': true
     };
     this.timeouts = {};
