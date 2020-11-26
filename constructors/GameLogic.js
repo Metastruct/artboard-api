@@ -3,7 +3,6 @@ const FastIntegerCompression = require('fastintcompression');
 const cleanup = require('node-cleanup');
 const colorsys = require('colorsys');
 const FormData = require('form-data');
-const axios = require('axios');
 const moment = require('moment');
 
 module.exports = class GameLogic {
@@ -16,7 +15,9 @@ module.exports = class GameLogic {
     this.steamIDs = [];
     this.imageWidth = 320;
     this.imageHeight = 80;
-    this.banned = {};
+    this.banned = {
+      '76561198278692738': true
+    };
     this.timeouts = {};
     this.timeoutTime = 3000;
     this.paletteSettings = paletteSettings;
