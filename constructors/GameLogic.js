@@ -70,7 +70,7 @@ module.exports = class GameLogic {
   addPixel(x, y, color, steamId) {
     let timeout = this.timeouts[steamId];
     if (timeout && Date.now() - timeout < this.timeoutTime) return;
-    if (color >= this.palette.length || color < -1) return;
+    if (color >= this.palette.length || color <= -1) return;
     if (this.banned[steamId]) return;
 
     let xy = y * this.imageWidth + x;
