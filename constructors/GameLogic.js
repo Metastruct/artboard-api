@@ -52,7 +52,7 @@ module.exports = class GameLogic {
       fs.writeFileSync(historyPath, Buffer.from(compressed));
 
       await this.app.Renderer.renderGIF();
-      this.image = [];
+      this.createImage();
       this.app.Web.broadcast('imageReset');
       this.executeWebhook();
     }
