@@ -14,10 +14,8 @@ module.exports = class Renderer {
     const cnv = new canvas.Canvas(imageWidth * 16, imageHeight * 16);
     const ctx = cnv.getContext('2d');
 
-    ctx.fillStyle = '#FFF';
-    ctx.fillRect(0, 0, imageWidth * 16, imageHeight * 16);
-
     image.forEach((color, xy) => {
+      if (color == -1) return;
       let x = xy % imageWidth;
       let y = (xy - x) / imageWidth;
       let rgb = palette[color] || [255, 255, 255];

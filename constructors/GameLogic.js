@@ -107,7 +107,7 @@ module.exports = class GameLogic {
 
     let space = this.imageWidth * this.imageHeight - 1;
     for (let i = 1; i <= space; i++) {
-      this.image.push(0);
+      this.image.push(-1);
     }
   }
 
