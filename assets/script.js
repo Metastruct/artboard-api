@@ -89,14 +89,13 @@ class BrowserEnviroment {
   }
 
   onResize() {
-    this.canvasElem.width = Math.max(
-      document.documentElement.clientWidth || 0,
-      window.innerWidth || 0
-    );
-    this.canvasElem.height = Math.max(
-      document.documentElement.clientHeight || 0,
-      window.innerHeight || 0
-    );
+    const width = this.canvasElem.clientWidth;
+		const height = this.canvasElem.clientHeight;
+
+    if (this.canvasElem.width !== width || this.canvasElem.height !== height) {
+			this.canvasElem.width = width;
+			this.canvasElem.height = height;
+		}
     this.renderImage();
   }
 
@@ -198,7 +197,7 @@ class BrowserEnviroment {
       my = Math.floor((mouseCoords[1] - offsetCoords[1]) / this.size);
     const xy = my * this.imageWidth + mx;
     const steamId = this.steamIDs[xy];
-    if (steamId) {
+    if (mx >= 0 && mx <= this.imageWidth - 1 && steamId) {
       const res = this.getSteamNameAvatar(steamId) /** @type {SteamResponse} */;
 
       infoElem.classList.remove('hidden');
