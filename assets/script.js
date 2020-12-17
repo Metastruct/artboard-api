@@ -81,7 +81,7 @@ class BrowserEnviroment {
     xhr.open('GET', `http://${document.location.host}/get/${sid}`);
     xhr.send();
     xhr.onload = () => {
-      if (xhr.readyState == xhr.DONE && xhr.status == 200)
+      if (xhr.readyState === xhr.DONE && xhr.status === 200)
         this.cache[sid] = JSON.parse(xhr.responseText);
     };
 
@@ -191,7 +191,7 @@ class BrowserEnviroment {
     } = this;
 
     const elem = document.elementFromPoint(mouseCoords[0], mouseCoords[1]);
-    if (elem == infoElem && infoElem.className.indexOf('hidden') < 0) return;
+    if (elem === infoElem && infoElem.className.indexOf('hidden') < 0) return;
 
     const mx = Math.floor((mouseCoords[0] - offsetCoords[0]) / this.size),
       my = Math.floor((mouseCoords[1] - offsetCoords[1]) / this.size);
@@ -206,10 +206,8 @@ class BrowserEnviroment {
 
       nicknameElem.innerHTML = res.nickname;
       nicknameElem.href = `https://steamcommunity.com/profiles/${steamId}`;
-      avatarElem.src = res.avatar;
-      try {
-        avatarElem.load();
-      } catch (err) {}
+      if (avatarElem.src !== res.avatar)
+        avatarElem.src = res.avatar;
     } else this.infoElem.classList.add('hidden');
   }
 
