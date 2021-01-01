@@ -104,6 +104,7 @@ module.exports = class GameLogic {
 
   createImage() {
     console.log('Creating a blank image...');
+    this.image = [];
 
     let space = this.imageWidth * this.imageHeight - 1;
     for (let i = 1; i <= space; i++) {
