@@ -11,11 +11,12 @@ before_script:
     - eval $(ssh-agent -s)
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
 
-test_index:
+test:
   stage: test
+  image: node:13.14.0 # current version installed on 3k
   script:
-    - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
-    - ssh metastruct@threekelv.in meta-pixels test
+    - npm install
+    - npx eslint . && npm run test
 
 build:
   stage: build
@@ -23,6 +24,8 @@ build:
     - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
     - ssh metastruct@threekelv.in meta-pixels build
   when: on_success
+  only:
+    - master
 
 deploy:
   stage: deploy
@@ -30,3 +33,5 @@ deploy:
     - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
     - ssh metastruct@threekelv.in meta-pixels deploy
   when: on_success
+  only:
+    - master
