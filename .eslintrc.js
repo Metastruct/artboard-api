@@ -16,4 +16,14 @@ module.exports = {
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
   },
+  overrides: [
+    {
+      files: [
+        '**/*.test.js',
+      ],
+      env: {
+        'jest': true,
+      },
+    },
+  ],
 };

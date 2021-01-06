@@ -4,7 +4,7 @@
   "description": "Pixels Web API for Meta Construct Garry's Mod servers.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0",
+    "test": "jest",
     "start": "node index.js",
     "build": "cd assets && npx google-closure-compiler -O ADVANCED --externs externs.js --js script.js --js_output_file static/script.js"
   },
@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "eslint": "^7.3.1",
+    "jest": "^26.6.3",
     "prettier": "^2.0.5"
   }
 }
