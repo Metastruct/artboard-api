@@ -5,24 +5,20 @@ stages:
   - build
   - deploy
 
-test_index:
-  stage: test
-  before_script:
+before_script:
     - 'which ssh-agent || ( apk --update add openssh-client bash)'
     - mkdir -p ~/.ssh
     - eval $(ssh-agent -s)
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+test_index:
+  stage: test
   script:
     - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
     - ssh metastruct@threekelv.in meta-pixels test
 
 build:
   stage: build
-  before_script:
-    - 'which ssh-agent || ( apk --update add openssh-client bash)'
-    - mkdir -p ~/.ssh
-    - eval $(ssh-agent -s)
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
     - ssh metastruct@threekelv.in meta-pixels build
@@ -30,11 +26,6 @@ build:
 
 deploy:
   stage: deploy
-  before_script:
-    - 'which ssh-agent || ( apk --update add openssh-client bash)'
-    - mkdir -p ~/.ssh
-    - eval $(ssh-agent -s)
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
   script:
     - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
     - ssh metastruct@threekelv.in meta-pixels deploy
