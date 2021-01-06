@@ -15,10 +15,7 @@ module.exports = class GameLogic {
     this.steamIDs = [];
     this.imageWidth = 320;
     this.imageHeight = 80;
-    this.banned = {
-      // Drew nazi symbol and left immediately after being exposed
-      '76561198278692738': true
-    };
+    this.banned = {};
     this.timeouts = {};
     this.timeoutTime = 3000;
     this.paletteSettings = paletteSettings;
