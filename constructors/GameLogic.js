@@ -44,7 +44,7 @@ module.exports = class GameLogic {
       this.image.length > 0 &&
       (day == 1 || day == 15)
     ) {
-      let compressed = FastIntegerCompression.compress(this.image);
+      let compressed = JSON.stringify(this.image);
       fs.writeFileSync(historyPath, Buffer.from(compressed));
 
       await this.app.Renderer.renderGIF();
