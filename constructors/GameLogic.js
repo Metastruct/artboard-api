@@ -80,6 +80,7 @@ module.exports = class GameLogic {
     this.image[xy] = color;
     this.steamIDs[xy] = steamId;
     this.app.Web.broadcast('addPixel', { xy, color, steamId });
+    this.app.Web.broadcast('executeTimeout', steamId);
 
     this.timeouts[steamId] = Date.now();
   }
