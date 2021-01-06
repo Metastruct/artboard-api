@@ -94,6 +94,8 @@ module.exports = class GameLogic {
         this.image[xy] = color;
     });
 
+    this.app.Web.broadcast('imageUpdate', { image: this.image, diff: pixels });
+
     if (!doNotTimeout)
       this.timeouts[steamId] = Date.now();
   }
