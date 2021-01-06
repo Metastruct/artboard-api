@@ -57,17 +57,24 @@ module.exports = class GameLogic {
   bindWebsocketEvents() {
     let ws = this.app.Web;
 
-    ws.on('addPixel', ({ x, y, color, steamId }, _ws, hasWriteAccess) => {
+    ws.on('addPixel', ({ x, y, pixels, color, steamId }, _ws, hasWriteAccess) => {
       if (!hasWriteAccess) return;
+      if (pixels)
+        return this.addPixels(pixels, steamId);
       this.addPixel(x, y, color, steamId);
     });
   }
 
-  addPixel(x, y, color, steamId) {
+  isSteamIDAllowed(steamId) {
     let timeout = this.timeouts[steamId];
     if (timeout && Date.now() - timeout < this.timeoutTime) return;
-    if (color >= this.palette.length || color < -2) return;
     if (this.banned[steamId]) return;
+    return true;
+  }
+
+  addPixel(x, y, color, steamId) {
+    if (!this.isSteamIDAllowed(steamId)) return;
+    if (color >= this.palette.length || color < -2) return;
 
     let xy = y * this.imageWidth + x;
     this.image[xy] = color;
@@ -75,6 +82,20 @@ module.exports = class GameLogic {
     this.app.Web.broadcast('addPixel', { xy, color, steamId });
 
     this.timeouts[steamId] = Date.now();
+  }
+
+  addPixels(pixels, steamId) {
+    if (!this.isSteamIDAllowed(steamId)) return;
+    let doNotTimeout = false;
+    pixels.forEach((color, xy) => {
+      if (color >= this.palette.length || color < -2 || doNotTimeout)
+        return doNotTimeout = true;
+      else
+        this.image[xy] = color;
+    });
+
+    if (!doNotTimeout)
+      this.timeouts[steamId] = Date.now();
   }
 
   loadPalette() {
