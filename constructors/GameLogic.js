@@ -86,23 +86,20 @@ module.exports = class GameLogic {
 
   addPixels(pixels, steamId) {
     if (!this.isSteamIDAllowed(steamId)) return;
-    let doNotTimeout = false;
     let copy = this.image;
 
     for (let xy in pixels) {
-      const color = pixels[xy]
+      const color = pixels[xy];
       xy = parseInt(xy);
+      color = color - 1;
       if (color >= this.palette.length || color < -2 || doNotTimeout || xy < 0 || xy >= this.image.length)
-        return doNotTimeout = true;
-      else
-        copy[xy] = color;
+        return;
+      copy[xy] = color;
     }
 
-    if (!doNotTimeout) {
-      this.timeouts[steamId] = Date.now();
-      this.image = copy;
-      this.app.Web.broadcast('imageUpdate', { image: this.image, diff: pixels });
-    }
+    this.timeouts[steamId] = Date.now();
+    this.image = copy;
+    this.app.Web.broadcast('imageUpdate', { image: this.image, diff: pixels });
   }
 
   loadPalette() {
