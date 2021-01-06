@@ -1,6 +1,11 @@
 # pixels-web-api
 Web API for Artboard (Pixels).
 
+## Notice
+History files before 01/06/2021 used FastIntCompression library, which had to be
+replaced due to save data corruption. History files that were created after this
+date use JSON.
+
 ## Configuration
 See `config.example.js`.
 
