@@ -99,6 +99,7 @@ module.exports = class GameLogic {
     this.timeouts[steamId] = Date.now();
     this.image = copy;
     this.app.Web.broadcast('imageUpdate', { image: this.image, diff: pixels });
+    this.app.Web.broadcast('executeTimeout', steamId);
   }
 
   loadPalette() {
