@@ -1,5 +1,4 @@
 const fs = require('fs');
-const FastIntegerCompression = require('fastintcompression');
 const cleanup = require('node-cleanup');
 const colorsys = require('colorsys');
 const FormData = require('form-data');
@@ -116,7 +115,7 @@ module.exports = class GameLogic {
     try {
       let buf = fs.readFileSync('save.dat');
 
-      this.image = FastIntegerCompression.uncompress(buf);
+      this.image = JSON.parse(buf);
     } catch (err) {
       console.log('Image load failed.', err);
       this.createImage();
@@ -128,8 +127,8 @@ module.exports = class GameLogic {
   saveImage() {
     console.log('Saving image...');
 
-    let compressed = FastIntegerCompression.compress(this.image);
-    fs.writeFileSync('save.dat', Buffer.from(compressed));
+    let compressed = JSON.stringify(this.image);
+    fs.writeFileSync('save.dat', compressed);
   }
 
   executeWebhook() {
