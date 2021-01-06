@@ -88,12 +88,15 @@ module.exports = class GameLogic {
     if (!this.isSteamIDAllowed(steamId)) return;
     let doNotTimeout = false;
     let copy = this.image;
-    pixels.forEach((color, xy) => {
+
+    for (let xy in pixels) {
+      const color = pixels[xy]
+      xy = parseInt(xy);
       if (color >= this.palette.length || color < -2 || doNotTimeout || xy < 0 || xy >= this.image.length)
         return doNotTimeout = true;
       else
         copy[xy] = color;
-    });
+    }
 
     if (!doNotTimeout) {
       this.timeouts[steamId] = Date.now();
