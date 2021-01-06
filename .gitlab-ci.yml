@@ -1,8 +1,8 @@
 image: alpine:latest
 
-
 stages:
   - test
+  - build
   - deploy
 
 test_index:
@@ -15,6 +15,18 @@ test_index:
   script:
     - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
     - ssh metastruct@threekelv.in meta-pixels test
+
+build:
+  stage: build
+  before_script:
+    - 'which ssh-agent || ( apk --update add openssh-client bash)'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - bash -c 'ssh-add <(echo "$PRIVATE_KEY")'
+    - ssh metastruct@threekelv.in meta-pixels build
+  when: on_success
 
 deploy:
   stage: deploy
