@@ -4,7 +4,7 @@
   "description": "Pixels Web API for Meta Construct Garry's Mod servers.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 0",
     "start": "node index.js",
     "build": "cd assets && npx google-closure-compiler -O ADVANCED --externs externs.js --js script.js --js_output_file static/script.js"
   },

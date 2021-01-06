@@ -88,7 +88,7 @@ module.exports = class GameLogic {
     if (!this.isSteamIDAllowed(steamId)) return;
     let doNotTimeout = false;
     pixels.forEach((color, xy) => {
-      if (color >= this.palette.length || color < -2 || doNotTimeout)
+      if (color >= this.palette.length || color < -2 || doNotTimeout || xy < 0 || xy > this.image.length - 1)
         return doNotTimeout = true;
       else
         this.image[xy] = color;
