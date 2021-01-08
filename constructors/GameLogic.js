@@ -92,7 +92,7 @@ module.exports = class GameLogic {
     for (let xy in pixels) {
       const color = pixels[xy] - 1;
       xy = parseInt(xy);
-      if (color >= this.palette.length || color < -2 || xy < 0 || xy >= this.image.length)
+      if (color >= this.palette.length || color < -2 || xy < 0 || xy > this.image.length)
         return;
       copy[xy] = color;
     }
