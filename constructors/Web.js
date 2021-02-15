@@ -62,8 +62,8 @@ module.exports = class Web extends EventEmitter {
   }
 
   onConnection(ws) {
-    let hasWriteAccess = this.writeIPs.indexOf(ws._socket.remoteAddress) >= 0;
-    let { image, banned, steamIDs, palette, timeoutTime } = this.app.GameLogic;
+    const hasWriteAccess = this.writeIPs.indexOf(ws._socket.remoteAddress) >= 0;
+    const { image, banned, steamIDs, palette, timeoutTime } = this.app.GameLogic;
 
     this.send(ws, 'writeAccess', hasWriteAccess);
     this.send(ws, 'imageInfo', {

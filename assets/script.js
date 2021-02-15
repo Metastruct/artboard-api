@@ -220,11 +220,9 @@ class BrowserEnviroment {
     this.externalCanvas.width = this.imageWidth;
     this.externalCanvas.height = this.imageHeight;
 
-    this.externalCtx.fillStyle = '#FFF';
-    this.externalCtx.fillRect(0, 0, this.imageWidth, this.imageHeight);
+    this.externalCtx.clearRect(0, 0, this.imageWidth, this.imageHeight);
 
     this.image.forEach((color, xy) => {
-      //xy++;
       const x = xy % this.imageWidth;
       const y = (xy - x) / this.imageWidth;
 

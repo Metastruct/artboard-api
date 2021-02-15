@@ -5,12 +5,12 @@ module.exports = class Utils {
   }
 
   sortAlphaNum(element1, element2) {
-    var aA = element1.replace(this.regexAlpha, '');
-    var bA = element2.replace(this.regexAlpha, '');
+    const aA = element1.replace(this.regexAlpha, '');
+    const bA = element2.replace(this.regexAlpha, '');
 
     if (aA === bA) {
-      var aN = parseInt(element1.replace(this.regexNumer, ''), 10);
-      var bN = parseInt(element2.replace(this.regexNumer, ''), 10);
+      const aN = parseInt(element1.replace(this.regexNumer, ''), 10);
+      const bN = parseInt(element2.replace(this.regexNumer, ''), 10);
 
       return aN === bN ? 0 : aN > bN ? 1 : -1;
     } else {

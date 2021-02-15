@@ -6,27 +6,31 @@ const moment = require('moment');
 module.exports = class Renderer {
   constructor(app) {
     this.app = app;
+
+    const { imageWidth, imageHeight } = this.app.GameLogic;
+    this.canvas = new canvas.Canvas(imageWidth * 16, imageHeight * 16);
+    this.ctx = this.canvas.getContext('2d');
   }
 
   renderFrame() {
-    let { imageWidth, imageHeight, image, palette } = this.app.GameLogic;
+    const { imageWidth, image, palette } = this.app.GameLogic;
+    const { width, height } = this.canvas;
 
-    const cnv = new canvas.Canvas(imageWidth * 16, imageHeight * 16);
-    const ctx = cnv.getContext('2d');
+    this.ctx.clearRect(0, 0, width, height);
 
     image.forEach((color, xy) => {
       if (color == -1) return;
-      let x = xy % imageWidth;
-      let y = (xy - x) / imageWidth;
-      let rgb = palette[color] || [255, 255, 255];
+      const x = xy % imageWidth;
+      const y = (xy - x) / imageWidth;
+      const rgb = palette[color] || [255, 255, 255];
       color = `rgb(${rgb.join(',')})`;
 
-      ctx.fillStyle = color;
-      ctx.fillRect(x * 16, y * 16, 16, 16);
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(x * 16, y * 16, 16, 16);
     });
 
-    let fileName = moment().format('MM-DD-YY');
-    let stream = cnv.createPNGStream();
+    const fileName = moment().format('MM-DD-YY');
+    const stream = this.canvas.createPNGStream();
 
     console.log(`Creating/overwriting a frame "${fileName}"...`);
 

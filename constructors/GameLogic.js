@@ -32,13 +32,13 @@ module.exports = class GameLogic {
   }
 
   async dailyCheck() {
-    let date = moment().format('MM-DD-YY');
+    const date = moment().format('MM-DD-YY');
 
     if (!fs.existsSync(`assets/frames/frame_${date}.png`))
       return this.app.Renderer.renderFrame();
 
-    let historyPath = `history/hi-${date}.dat`;
-    let day = new Date().getDate();
+    const historyPath = `history/hi-${date}.dat`;
+    const day = new Date().getDate();
     if (
       !fs.existsSync(historyPath) &&
       this.image.length > 0 &&
@@ -55,7 +55,7 @@ module.exports = class GameLogic {
   }
 
   bindWebsocketEvents() {
-    let ws = this.app.Web;
+    const ws = this.app.Web;
 
     ws.on('addPixel', ({ x, y, pixels, color, steamId }, _ws, hasWriteAccess) => {
       if (!hasWriteAccess) return;
@@ -66,7 +66,7 @@ module.exports = class GameLogic {
   }
 
   isSteamIDAllowed(steamId) {
-    let timeout = this.timeouts[steamId];
+    const timeout = this.timeouts[steamId];
     if (timeout && Date.now() - timeout < this.timeoutTime) return;
     if (this.banned[steamId]) return;
     return true;
@@ -76,7 +76,7 @@ module.exports = class GameLogic {
     if (!this.isSteamIDAllowed(steamId)) return;
     if (color >= this.palette.length || color < -2) return;
 
-    let xy = y * this.imageWidth + x;
+    const xy = y * this.imageWidth + x;
     this.image[xy] = color;
     this.steamIDs[xy] = steamId;
     this.app.Web.broadcast('addPixel', { xy, color, steamId });
@@ -85,7 +85,7 @@ module.exports = class GameLogic {
     this.timeouts[steamId] = Date.now();
   }
 
-    addPixels(pixels, steamId) {
+  addPixels(pixels, steamId) {
     if (!this.isSteamIDAllowed(steamId)) return;
     let imageCopy = this.image;
     let steamIDsCopy = this.steamIDs;
@@ -111,8 +111,8 @@ module.exports = class GameLogic {
 
     this.palette = [];
 
-    let { colored, gray } = this.paletteSettings;
-    let hueNum = 360 / colored;
+    const { colored, gray } = this.paletteSettings;
+    const hueNum = 360 / colored;
 
     for (let i = 1; i <= gray; i++) {
       let { r, g, b } = colorsys.hsv2Rgb(0, 0, 100 / i);
@@ -142,7 +142,7 @@ module.exports = class GameLogic {
     console.log('Loading image...');
 
     try {
-      let buf = fs.readFileSync('save.dat');
+      const buf = fs.readFileSync('save.dat');
 
       this.image = JSON.parse(buf);
     } catch (err) {
@@ -156,8 +156,8 @@ module.exports = class GameLogic {
   saveImage() {
     console.log('Saving image...');
 
-    let compressed = JSON.stringify(this.image);
-    fs.writeFileSync('save.dat', compressed);
+    const json = JSON.stringify(this.image);
+    fs.writeFileSync('save.dat', json);
   }
 
   executeWebhook() {
