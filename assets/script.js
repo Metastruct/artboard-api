@@ -3,28 +3,29 @@
 */
 
 /* eslint no-undef: 0 */
-class BrowserEnviroment {
+
+class Artboard {
   constructor() {
-    this.errorElem = document.querySelector('.error');
-    this.infoElem = document.querySelector('.info');
-    this.avatarElem = document.querySelector('.avatar');
-    this.nicknameElem = document.querySelector('.nickname');
-    this.canvasElem = document.querySelector('#canvas');
+    this.errorElem      = document.querySelector('.error');
+    this.infoElem       = document.querySelector('.info');
+    this.avatarElem     = document.querySelector('.avatar');
+    this.nicknameElem   = document.querySelector('.nickname');
+    this.canvasElem     = document.querySelector('#canvas');
     this.externalCanvas = document.querySelector('#external');
-    this.canvasCtx = this.canvasElem.getContext('2d');
-    this.externalCtx = this.externalCanvas.getContext('2d');
-    this.palette = null;
-    this.steamIDs = {};
-    this.image = null;
-    this.imageWidth = 320;
-    this.imageHeight = 80;
-    this.imageBlob = null;
-    this.size = 10;
-    this.isDragging = false;
-    this.offsetCoords = [0, 0];
-    this.mouseCoords = [0, 0];
-    this.oldMouseCoords = [0, 0];
-    this.cache = {};
+
+    this.canvasCtx      = this.canvasElem.getContext('2d');
+    this.externalCtx    = this.externalCanvas.getContext('2d');
+
+    this.imageWidth     = 320;
+    this.imageHeight    = 80;
+
+    this.size           = 3;
+    this.offsetCoords   = [0, 0];
+    this.velocity       = [0, 0];
+    this.speed          = [0, 0];
+    this.friction       = 0.02;
+
+    this.cache          = {};
 
     this.onResize();
     this.openConnection();
@@ -38,16 +39,22 @@ class BrowserEnviroment {
       () => (this.isDragging = false)
     );
     window.addEventListener('mousedown', (e) => {
+      this.velocity = [0, 0];
       this.isDragging = true;
       this.oldMouseCoords = [e.clientX, e.clientY];
     });
     window.addEventListener('mousemove', (e) => {
+      this.mouseCoords = [e.clientX, e.clientY];
       if (this.isDragging) {
         const dx = e.clientX - this.oldMouseCoords[0],
           dy = e.clientY - this.oldMouseCoords[1];
 
         this.offsetCoords[0] += dx;
         this.offsetCoords[1] += dy;
+
+        const [x1, y1] = this.oldMouseCoords;
+        const [x2, y2] = this.mouseCoords;
+        this.speed = [x2 - x1, y2 - y1];
 
         this.oldMouseCoords = [e.clientX, e.clientY];
       }
@@ -66,9 +73,6 @@ class BrowserEnviroment {
       this.offsetCoords[1] -= wy * height * size;
       this.size += size;
     });
-    this.canvasElem.addEventListener('mousemove',
-      (e) => (this.mouseCoords = [e.clientX, e.clientY])
-    );
 
     window.requestAnimationFrame(() => this.renderCanvas());
   }
@@ -90,12 +94,12 @@ class BrowserEnviroment {
 
   onResize() {
     const width = this.canvasElem.clientWidth;
-		const height = this.canvasElem.clientHeight;
+    const height = this.canvasElem.clientHeight;
 
     if (this.canvasElem.width !== width || this.canvasElem.height !== height) {
-			this.canvasElem.width = width;
-			this.canvasElem.height = height;
-		}
+      this.canvasElem.width = width;
+      this.canvasElem.height = height;
+    }
     this.renderImage();
   }
 
@@ -182,6 +186,35 @@ class BrowserEnviroment {
   }
 
   update() {
+    this.updateVelocity();
+    this.updateInformationElement();
+  }
+
+  updateVelocity() {
+    if (this.isDragging) return;
+
+    this.velocity[0] += this.speed[0];
+    this.velocity[1] += this.speed[1];
+
+    let speed = Math.hypot(this.velocity[0], this.velocity[1]);
+    const angle = Math.atan2(this.velocity[1], this.velocity[0]);
+
+    if (speed > this.friction)
+      speed -= this.friction
+    else
+      speed = 0;
+
+    this.velocity[0] = Math.cos(angle) * speed;
+    this.velocity[1] = Math.sin(angle) * speed;
+
+    this.offsetCoords[0] += this.velocity[0];
+    this.offsetCoords[1] += this.velocity[1];
+
+    this.speed = [0, 0];
+    console.log(this.velocity);
+  }
+
+  updateInformationElement() {
     const {
       infoElem,
       mouseCoords,
@@ -189,6 +222,8 @@ class BrowserEnviroment {
       nicknameElem,
       avatarElem,
     } = this;
+
+    if (!mouseCoords) return;
 
     const elem = document.elementFromPoint(mouseCoords[0], mouseCoords[1]);
     if (elem === infoElem && infoElem.className.indexOf('hidden') < 0) return;
@@ -238,6 +273,6 @@ class BrowserEnviroment {
       this.imageBlob.src = url;
     });
   }
-}
+};
 
-window.$browenv = new BrowserEnviroment();
+window.$browenv = new Artboard();
