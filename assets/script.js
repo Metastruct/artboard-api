@@ -23,7 +23,7 @@ class Artboard {
     this.offsetCoords   = [0, 0];
     this.velocity       = [0, 0];
     this.speed          = [0, 0];
-    this.friction       = 0.02;
+    this.friction       = 0.01;
 
     this.cache          = {};
 

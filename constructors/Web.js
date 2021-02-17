@@ -30,7 +30,7 @@ module.exports = class Web extends EventEmitter {
       res.sendFile(
         resolve(
           __dirname, '../assets/frames/', 
-          moment().format('MM-DD-YY-HH') + '.png'
+          `frame_${moment().format('MM-DD-YY-HH')}.png`
         )
       )
     );
