@@ -48,7 +48,7 @@ module.exports = class Renderer {
     console.log('Creating a GIF...');
 
     let gif = gm();
-    gif.delay(100);
+    gif.delay(10);
 
     for (let file of files) {
       if (!file.startsWith('frame_')) continue;
