@@ -8,7 +8,7 @@ module.exports = class GameLogic {
   constructor(app) {
     this.app = app;
 
-    let { paletteSettings } = this.app.config;
+    const { paletteSettings } = this.app.config;
 
     this.image = [];
     this.steamIDs = [];
@@ -44,7 +44,7 @@ module.exports = class GameLogic {
       this.image.length > 0 &&
       (day == 1 || day == 15)
     ) {
-      let compressed = JSON.stringify(this.image);
+      const compressed = JSON.stringify(this.image);
       fs.writeFileSync(historyPath, Buffer.from(compressed));
 
       await this.app.Renderer.renderGIF();
