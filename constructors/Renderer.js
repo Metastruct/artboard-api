@@ -29,7 +29,7 @@ module.exports = class Renderer {
       this.ctx.fillRect(x * 16, y * 16, 16, 16);
     });
 
-    const fileName = moment().format('MM-DD-YY-hh');
+    const fileName = moment().format('MM-DD-YY-HH');
     const stream = this.canvas.createPNGStream();
 
     console.log(`Creating/overwriting a frame "${fileName}"...`);

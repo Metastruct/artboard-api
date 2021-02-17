@@ -32,7 +32,7 @@ module.exports = class GameLogic {
   }
 
   async dailyCheck() {
-    const date = moment().format('MM-DD-YY-hh');
+    const date = moment().format('MM-DD-YY-HH');
 
     if (!fs.existsSync(`assets/frames/frame_${date}.png`))
       return this.app.Renderer.renderFrame();

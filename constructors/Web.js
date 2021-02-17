@@ -27,7 +27,12 @@ module.exports = class Web extends EventEmitter {
       this.handleSteamRequest(req, res)
     );
     this.express.get('/latest', (_req, res) =>
-      res.sendFile(resolve(__dirname, moment().format('MM-DD-YY-hh')))
+      res.sendFile(
+        resolve(
+          __dirname, '../assets/frames/', 
+          moment().format('MM-DD-YY-HH') + '.png'
+        )
+      )
     );
 
     this.websocket.on('connection', (ws) => this.onConnection(ws));
