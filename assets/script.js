@@ -23,7 +23,7 @@ class Artboard {
     this.offsetCoords   = [0, 0];
     this.velocity       = [0, 0];
     this.speed          = [0, 0];
-    this.friction       = 0.01;
+    this.friction       = 0.25;
 
     this.cache          = {};
 
@@ -211,7 +211,6 @@ class Artboard {
     this.offsetCoords[1] += this.velocity[1];
 
     this.speed = [0, 0];
-    console.log(this.velocity);
   }
 
   updateInformationElement() {
