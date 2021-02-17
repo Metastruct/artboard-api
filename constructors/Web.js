@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const { resolve } = require('path');
 const { EventEmitter } = require('events');
+const moment = require('moment');
 const axios = require('axios');
 const { parseStringPromise } = require('xml2js');
 
@@ -24,6 +25,9 @@ module.exports = class Web extends EventEmitter {
     );
     this.express.get('/get/:id', (req, res) =>
       this.handleSteamRequest(req, res)
+    );
+    this.express.get('/latest', (_req, res) =>
+      res.sendFile(resolve(__dirname, moment().format('MM-DD-YY-hh')))
     );
 
     this.websocket.on('connection', (ws) => this.onConnection(ws));
