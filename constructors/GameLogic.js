@@ -115,12 +115,15 @@ module.exports = class GameLogic {
     const hueNum = 360 / colored;
 
     for (let i = 1; i <= gray; i++) {
-      let { r, g, b } = colorsys.hsv2Rgb(0, 0, 100 / i);
+      const { r, g, b } = colorsys.hsv2Rgb(0, 0, 100 / i);
       this.palette.push([r, g, b]);
     }
 
-    for (let i = 1; i <= colored; i++) {
-      let { r, g, b } = colorsys.hsv2Rgb(hueNum * i, 100, 100);
+    for (let i = 1; i <= colored * 2; i++) {
+      const I = i % colored;
+      const isDark = i > colored;
+
+      const { r, g, b } = colorsys.hsv2Rgb(hueNum * I, 100, isDark ? 50 : 100);
       this.palette.push([r, g, b]);
     }
 

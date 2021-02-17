@@ -223,10 +223,11 @@ class BrowserEnviroment {
     this.externalCtx.clearRect(0, 0, this.imageWidth, this.imageHeight);
 
     this.image.forEach((color, xy) => {
+      if (color == -1) return;
       const x = xy % this.imageWidth;
       const y = (xy - x) / this.imageWidth;
 
-      let rgb = this.palette[color] || [255, 255, 255];
+      const rgb = this.palette[color] || [255, 255, 255];
       this.externalCtx.fillStyle = `rgb(${rgb.join(',')})`;
       this.externalCtx.fillRect(x, y, 1, 1);
     });
