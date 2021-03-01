@@ -37,7 +37,7 @@ module.exports = class GameLogic {
     if (!fs.existsSync(`assets/frames/frame_${date}.png`))
       return this.app.Renderer.renderFrame();
 
-    const historyPath = `history/hi-${date}.dat`;
+    const historyPath = `history/hi-${moment().format('MM-DD-YY')}.dat`;
     const day = new Date().getDate();
     if (
       !fs.existsSync(historyPath) &&
