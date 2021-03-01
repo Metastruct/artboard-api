@@ -45,7 +45,7 @@ module.exports = class Renderer {
 
     let gif = gm();
     gif.delay(10);
-    gif.in(`assets/frames/frame_*.png`);
+    gif.in('assets/frames/frame_*.png');
 
     await new Promise((res, rej) => {
       gif.write('assets/static/result.gif', (err) => {
@@ -54,6 +54,7 @@ module.exports = class Renderer {
       });
     });
 
+    const files = (await promises.readdir('assets/frames/'));
     for (let file of files) await promises.unlink(`assets/frames/${file}`);
   }
 };
