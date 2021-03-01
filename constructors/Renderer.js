@@ -41,19 +41,11 @@ module.exports = class Renderer {
   }
 
   async renderGIF() {
-    let files = (await promises.readdir('assets/frames/')).sort((e1, e2) =>
-      this.app.Utils.sortAlphaNum(e1, e2)
-    );
-
     console.log('Creating a GIF...');
 
     let gif = gm();
     gif.delay(10);
-
-    for (let file of files) {
-      if (!file.startsWith('frame_')) continue;
-      gif.in(`assets/frames/${file}`);
-    }
+    gif.in(`assets/frames/frame_*.png`);
 
     await new Promise((res, rej) => {
       gif.write('assets/static/result.gif', (err) => {
