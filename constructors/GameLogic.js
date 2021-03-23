@@ -1,6 +1,5 @@
 const fs = require('fs');
 const cleanup = require('node-cleanup');
-const colorsys = require('colorsys');
 const FormData = require('form-data');
 const moment = require('moment');
 
@@ -24,7 +23,7 @@ module.exports = class GameLogic {
   }
 
   async initialize() {
-    this.loadPalette();
+    this.loadPalettes();
     this.loadImage();
     this.bindWebsocketEvents();
 
@@ -106,34 +105,25 @@ module.exports = class GameLogic {
     this.app.Web.broadcast('executeTimeout', steamId);
   }
 
-  loadPalette() {
-    console.log('Loading palette...');
+  loadPalettes() {
+    console.log('Loading palettes...');
 
-    this.palette = [];
+    this.palettes = [];
 
-    const { colored, gray } = this.paletteSettings;
-    const hueNum = 360 / colored;
+    const filenameRegex = /\.[^/.]+$/;
+    for (let file of fs.readdirSync('palettes/')) {
+      file = file.replace(filenameRegex, '');
+      const palette = (require(`../palettes/${file}`))(this);
 
-    for (let i = 1; i <= gray; i++) {
-      const { r, g, b } = colorsys.hsv2Rgb(0, 0, 100 / i);
-      this.palette.push([r, g, b]);
+      this.palettes.push(palette);
     }
-
-    for (let i = 1; i <= colored * 2; i++) {
-      const I = i % colored;
-      const isDark = i > colored;
-
-      const { r, g, b } = colorsys.hsv2Rgb(hueNum * I, 100, isDark ? 50 : 100);
-      this.palette.push([r, g, b]);
-    }
-
-    console.log('Palette colors in total:', this.palette.length);
   }
 
   createImage() {
     console.log('Creating a blank image...');
     this.image = [];
     this.steamIDs = [];
+    this.palette = this.palettes[Math.floor(Math.random() * this.palettes.length)];
 
     let space = this.imageWidth * this.imageHeight - 1;
     for (let i = 1; i <= space; i++) {
@@ -146,8 +136,11 @@ module.exports = class GameLogic {
 
     try {
       const buf = fs.readFileSync('save.dat');
+      const { image, palette, steamIDs } = JSON.parse(buf);
 
-      this.image = JSON.parse(buf);
+      this.image = image;
+      this.palette = palette;
+      this.steamIDs = steamIDs;
     } catch (err) {
       console.log('Image load failed.', err);
       this.createImage();
@@ -159,7 +152,11 @@ module.exports = class GameLogic {
   saveImage() {
     console.log('Saving image...');
 
-    const json = JSON.stringify(this.image);
+    const json = JSON.stringify({
+      image: this.image,
+      palette: this.palette,
+      steamIDs: this.steamIDs
+    });
     fs.writeFileSync('save.dat', json);
   }
 
