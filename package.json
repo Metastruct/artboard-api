@@ -20,7 +20,7 @@
   "homepage": "https://gitlab.com/metastruct/pixels-web-api#readme",
   "dependencies": {
     "axios": "^0.21.1",
-    "canvas": "^2.6.1",
+    "canvas": "^2.7.0",
     "colorsys": "^1.0.22",
     "express": "^4.17.1",
     "form-data": "^3.0.0",
