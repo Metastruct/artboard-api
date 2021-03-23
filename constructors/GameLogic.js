@@ -1,4 +1,4 @@
-const { promises } = require('fs');
+const fs = require('fs');
 const cleanup = require('node-cleanup');
 const FormData = require('form-data');
 const moment = require('moment');
@@ -111,9 +111,9 @@ module.exports = class GameLogic {
     this.palettes = [];
 
     const filenameRegex = /\.[^/.]+$/;
-    for (let file of (await promises.readdir('palettes/'))) {
+    for (let file of fs.readdirSync('palettes/')) {
       file = file.replace(filenameRegex, '');
-      const palette = (require(`../palettes/${file}`))(this);
+      const palette = (require(`../palettes/${file}`))(this.app);
 
       this.palettes.push(palette);
     }
