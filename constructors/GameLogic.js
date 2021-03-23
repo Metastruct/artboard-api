@@ -1,4 +1,4 @@
-const fs = require('fs');
+const { promises } = require('fs');
 const cleanup = require('node-cleanup');
 const FormData = require('form-data');
 const moment = require('moment');
@@ -23,7 +23,7 @@ module.exports = class GameLogic {
   }
 
   async initialize() {
-    this.loadPalettes();
+    await this.loadPalettes();
     this.loadImage();
     this.bindWebsocketEvents();
 
@@ -105,13 +105,13 @@ module.exports = class GameLogic {
     this.app.Web.broadcast('executeTimeout', steamId);
   }
 
-  loadPalettes() {
+  async loadPalettes() {
     console.log('Loading palettes...');
 
     this.palettes = [];
 
     const filenameRegex = /\.[^/.]+$/;
-    for (let file of fs.readdirSync('palettes/')) {
+    for (let file of (await promises.readdir('palettes/'))) {
       file = file.replace(filenameRegex, '');
       const palette = (require(`../palettes/${file}`))(this);
 
@@ -123,7 +123,7 @@ module.exports = class GameLogic {
     console.log('Creating a blank image...');
     this.image = [];
     this.steamIDs = [];
-    this.palette = this.palettes[Math.floor(Math.random() * this.palettes.length)];
+    this.palette = this.palettes[Math.floor(Math.random() * this.palettes.length)] || [ [0, 0, 0] ];
 
     let space = this.imageWidth * this.imageHeight - 1;
     for (let i = 1; i <= space; i++) {
