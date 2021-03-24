@@ -11,8 +11,8 @@ module.exports = class GameLogic {
 
     this.image = [];
     this.steamIDs = [];
-    this.imageWidth = 320;
-    this.imageHeight = 80;
+    this.imageWidth = 640;
+    this.imageHeight = 160;
     this.banned = {};
     this.timeouts = {};
     this.timeoutTime = 3000;

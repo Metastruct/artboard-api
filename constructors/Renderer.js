@@ -8,7 +8,11 @@ module.exports = class Renderer {
     this.app = app;
 
     const { imageWidth, imageHeight } = this.app.GameLogic;
-    this.canvas = new canvas.Canvas(imageWidth * 16, imageHeight * 16);
+    this.pixelSize = 8;
+    this.canvas = new canvas.Canvas(
+      imageWidth * this.PixelSize,
+      imageHeight * this.PixelSize
+    );
     this.ctx = this.canvas.getContext('2d');
   }
 
@@ -26,7 +30,12 @@ module.exports = class Renderer {
       color = `rgb(${rgb.join(',')})`;
 
       this.ctx.fillStyle = color;
-      this.ctx.fillRect(x * 16, y * 16, 16, 16);
+      this.ctx.fillRect(
+        x * this.PixelSize,
+        y * this.PixelSize,
+        this.PixelSize,
+        this.PixelSize
+      );
     });
 
     const fileName = moment().format('MM-DD-YY-HH');
@@ -44,8 +53,13 @@ module.exports = class Renderer {
     console.log('Creating a GIF...');
 
     let gif = gm();
-    gif.delay(10);
-    gif.in('assets/frames/frame_*.png');
+    gif.in('assets/frames/frame_*.png')
+      .delay(10)
+      .bitdepth(8)
+      .colors(192)
+      .dither(false)
+      .filter('Point')
+      .antialias(false);
 
     await new Promise((res, rej) => {
       gif.write('assets/static/result.gif', (err) => {

@@ -16,8 +16,8 @@ class Artboard {
     this.canvasCtx      = this.canvasElem.getContext('2d');
     this.externalCtx    = this.externalCanvas.getContext('2d');
 
-    this.imageWidth     = 320;
-    this.imageHeight    = 80;
+    this.imageWidth     = 640;
+    this.imageHeight    = 160;
 
     this.size           = 3;
     this.offsetCoords   = [0, 0];
