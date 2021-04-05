@@ -7,7 +7,7 @@ module.exports = ({ config }) => {
   const hueNum = 360 / colored;
 
   for (let i = 1; i <= gray; i++) {
-    const { r, g, b } = colorsys.hsv2Rgb(0, 0, 100 / i);
+    const { r, g, b } = colorsys.hsv2Rgb(0, 0, 100 / (gray - i));
     palette.push([r, g, b]);
   }
 
