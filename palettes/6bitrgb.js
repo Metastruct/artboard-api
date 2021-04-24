@@ -7,8 +7,10 @@ module.exports = () => {
   let palette = [];
 
   for (const hex of paletteFile.toString().split('\n')) {
-    const { r, g, b } = colorsys.hex2Rgb(hex);
-    palette.push([r, g, b]);
+    try {
+      const { r, g, b } = colorsys.hex2Rgb(hex);
+      palette.push([r, g, b]);
+    } catch (err) {}
   }
 
   return palette;
