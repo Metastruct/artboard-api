@@ -10,8 +10,8 @@ module.exports = class Renderer {
     const { imageWidth, imageHeight } = this.app.GameLogic;
     this.pixelSize = 8;
     this.canvas = new canvas.Canvas(
-      imageWidth * this.PixelSize,
-      imageHeight * this.PixelSize
+      imageWidth * this.pixelSize,
+      imageHeight * this.pixelSize
     );
     this.ctx = this.canvas.getContext('2d');
   }
@@ -31,10 +31,10 @@ module.exports = class Renderer {
 
       this.ctx.fillStyle = color;
       this.ctx.fillRect(
-        x * this.PixelSize,
-        y * this.PixelSize,
-        this.PixelSize,
-        this.PixelSize
+        x * this.pixelSize,
+        y * this.pixelSize,
+        this.pixelSize,
+        this.pixelSize
       );
     });
 
