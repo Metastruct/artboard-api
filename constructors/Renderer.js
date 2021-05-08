@@ -40,6 +40,7 @@ module.exports = class Renderer {
 
     const fileName = moment().format('MM-DD-YY-HH');
     const stream = this.canvas.createPNGStream();
+    stream.on('error', (err) => console.error(err));
 
     console.log(`Creating/overwriting a frame "${fileName}"...`);
 
