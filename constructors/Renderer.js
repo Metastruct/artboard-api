@@ -45,6 +45,7 @@ module.exports = class Renderer {
 
     const out = createWriteStream(`assets/frames/frame_${fileName}.png`);
     out.on('finish', () => console.log('The PNG file was created.'));
+    out.on('error', (err) => console.error(err));
 
     return stream.pipe(out);
   }
@@ -52,9 +53,11 @@ module.exports = class Renderer {
   async renderGIF() {
     console.log('Creating a GIF...');
 
+    const { width, height } = this.canvas;
     let gif = gm();
     gif.in('assets/frames/frame_*.png')
       .delay(10)
+      .resize(width / 4, height / 4)
       .bitdepth(8)
       .colors(192)
       .dither(false)
