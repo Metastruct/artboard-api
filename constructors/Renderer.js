@@ -58,12 +58,8 @@ module.exports = class Renderer {
     let gif = gm();
     gif.in('assets/frames/frame_*.png')
       .delay(10)
-      .resize(width / 4, height / 4)
-      .bitdepth(8)
-      .colors(192)
-      .dither(false)
-      .filter('Point')
-      .antialias(false);
+      .dispose('previous')
+      .resize(width / 4, height / 4);
 
     await new Promise((res, rej) => {
       gif.write('assets/static/result.gif', (err) => {

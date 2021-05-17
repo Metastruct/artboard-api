@@ -1,4 +1,6 @@
 const fs = require('fs');
+const axios = require('axios');
+const colorsys = require('colorsys');
 const cleanup = require('node-cleanup');
 const FormData = require('form-data');
 const moment = require('moment');
@@ -23,7 +25,6 @@ module.exports = class GameLogic {
   }
 
   async initialize() {
-    await this.loadPalettes();
     this.loadImage();
     this.bindWebsocketEvents();
 
@@ -105,25 +106,26 @@ module.exports = class GameLogic {
     this.app.Web.broadcast('executeTimeout', steamId);
   }
 
-  async loadPalettes() {
-    console.log('Loading palettes...');
+  async getRandomPalette() {
+    const { request } = await axios.get('https://lospec.com/palette-list/random');
+    const { data } = await axios(request.res.responseUrl + '.hex');
+    let palette = [];
 
-    this.palettes = [];
-
-    const filenameRegex = /\.[^/.]+$/;
-    for (let file of fs.readdirSync('palettes/')) {
-      file = file.replace(filenameRegex, '');
-      const palette = (require(`../palettes/${file}`))(this.app);
-
-      this.palettes.push(palette);
+    for (const hex of data.split('\r\n')) {
+      try {
+        const { r, g, b } = colorsys.hex2Rgb(hex);
+        palette.push([r, g, b]);
+      } catch (err) {}
     }
+
+    return palette;
   }
 
-  createImage() {
+  async createImage() {
     console.log('Creating a blank image...');
     this.image = [];
     this.steamIDs = [];
-    this.palette = this.palettes[Math.floor(Math.random() * this.palettes.length)] || [ [0, 0, 0] ];
+    this.palette = await this.getRandomPalette();
 
     let space = this.imageWidth * this.imageHeight - 1;
     for (let i = 1; i <= space; i++) {
@@ -143,7 +145,6 @@ module.exports = class GameLogic {
       this.steamIDs = steamIDs;
     } catch (err) {
       console.log('Image load failed.', err);
-      this.createImage();
     }
 
     if (this.image.length == 0) this.createImage();
