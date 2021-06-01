@@ -49,7 +49,7 @@ module.exports = class GameLogic {
 
       await this.app.Renderer.renderGIF();
       await this.createImage();
-      this.app.Web.broadcast('imageReset', this.palette);
+      this.app.Web.broadcast('imageReset');
       this.executeWebhook();
     }
   }
@@ -131,6 +131,15 @@ module.exports = class GameLogic {
     for (let i = 1; i <= space; i++) {
       this.image.push(-1);
     }
+
+    const { banned, steamIDs, timeoutTime } = this;
+    this.broadcast('imageInfo', {
+      image: this.image,
+      palette: this.palette,
+      banned,
+      steamIDs,
+      timeoutTime,
+    });
   }
 
   loadImage() {
