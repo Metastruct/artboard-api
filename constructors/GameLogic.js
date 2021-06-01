@@ -34,7 +34,7 @@ module.exports = class GameLogic {
   async dailyCheck() {
     const date = moment().format('MM-DD-YY-HH');
 
-    if (!fs.existsSync(`assets/frames/frame_${date}.png`))
+    if (!fs.existsSync(`assets/frames/frame_${date}.png`) && (new Date).getHours() % 2 === 0)
       return this.app.Renderer.renderFrame();
 
     const historyPath = `history/hi-${moment().format('MM-DD-YY')}.dat`;
@@ -48,8 +48,8 @@ module.exports = class GameLogic {
       fs.writeFileSync(historyPath, Buffer.from(compressed));
 
       await this.app.Renderer.renderGIF();
-      this.createImage();
-      this.app.Web.broadcast('imageReset');
+      await this.createImage();
+      this.app.Web.broadcast('imageReset', this.palette);
       this.executeWebhook();
     }
   }
