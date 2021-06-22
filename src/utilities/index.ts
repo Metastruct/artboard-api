@@ -11,6 +11,7 @@ export const HISTORY_DATE_FORMAT = 'MM-DD-YY';
 export const REGEX_FILENAME = /\.[^/.]+$/;
 export const LOSPEC_RANDOM_ENDPOINT = 'https://lospec.com/palette-list/random';
 export const SAVE_FILENAME = 'save.dat';
+export const REMOTE_ADDRESS_PREFIX = '::ffff:';
 
 export function assertConfiguration(
   needed: Record<string, string>,

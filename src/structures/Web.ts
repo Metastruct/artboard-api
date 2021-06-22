@@ -14,6 +14,7 @@ import {
   WebSocketServer,
   WebSocket,
   FRAME_DATE_FORMAT,
+  REMOTE_ADDRESS_PREFIX,
 } from '../utilities';
 
 export default class Web extends BaseEventEmitterStructure {
@@ -94,7 +95,9 @@ export default class Web extends BaseEventEmitterStructure {
     request: IncomingMessage
   ) {
     socket.hasWriteAccess =
-      this.writeIPs.indexOf(request.socket.remoteAddress) !== -1;
+      this.writeIPs.indexOf(
+        request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length)
+      ) !== -1;
     socket.sendPayload('writeAccess', socket.hasWriteAccess);
     socket.emit('connection', socket);
     socket.on('message', (data: ws.Data) => {
