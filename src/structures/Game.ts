@@ -13,7 +13,7 @@ export default class Game extends BaseStructure {
   public palette?: Array<Array<number>>;
   public readonly dimensions: Array<number>;
   private steamIDs?: Array<string>;
-  private timeouts: Record<string, number>;
+  private timeouts: Record<string, number> = {};
   private readonly banned?: Record<string, boolean>;
   private readonly timeoutTime?: number;
   private readonly webhookURL: string;
