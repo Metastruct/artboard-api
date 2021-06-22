@@ -4,7 +4,7 @@ import * as dayjs from 'dayjs';
 import * as express from 'express';
 import { createServer, IncomingMessage, Server } from 'http';
 import { resolve } from 'path';
-import * as ws from 'ws';
+import { Data } from 'ws';
 import { parseStringPromise } from 'xml2js';
 
 import Application from '../Application';
@@ -100,11 +100,11 @@ export default class Web extends BaseEventEmitterStructure {
       ) !== -1;
     socket.sendPayload('writeAccess', socket.hasWriteAccess);
     socket.emit('connection', socket);
-    socket.on('message', (data: ws.Data) => {
+    socket.on('message', (data: Data) => {
       try {
         const parsed = JSON.parse(data.toString());
         if (parsed.op && typeof parsed.op === 'string')
-          this.emit('m_' + parsed.op, ws, parsed.data);
+          this.emit('m_' + parsed.op, socket, parsed.data);
         else socket.close(WEBSOCKET_UNSUPPORTED_PAYLOAD);
       } catch (err) {
         socket.close(WEBSOCKET_UNSUPPORTED_PAYLOAD);
