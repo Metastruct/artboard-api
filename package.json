@@ -1,12 +1,13 @@
 {
   "name": "pixels-web-api",
   "version": "1.0.0",
-  "description": "Pixels Web API for Meta Construct Garry's Mod servers.",
+  "description": "Artboard Web API for Meta Construct Garry's Mod servers.",
   "main": "index.js",
   "scripts": {
     "test": "jest",
     "start": "node index.js",
-    "build": "cd assets && npx google-closure-compiler -O ADVANCED --externs externs.js --js script.js --js_output_file static/script.js"
+    "build:web": "cd assets && npx google-closure-compiler -O ADVANCED --externs externs.js --js script.js --js_output_file static/script.js",
+    "build:ts": "tsc"
   },
   "repository": {
     "type": "git",
@@ -20,17 +21,23 @@
   "homepage": "https://gitlab.com/metastruct/pixels-web-api#readme",
   "dependencies": {
     "axios": "^0.21.1",
-    "canvas": "^2.7.0",
+    "canvas": "^2.8.0",
     "colorsys": "^1.0.22",
+    "dayjs": "^1.10.5",
     "express": "^4.17.1",
     "form-data": "^3.0.0",
     "gm": "^1.23.1",
-    "moment": "^2.27.0",
     "node-cleanup": "^2.1.2",
     "ws": "^7.3.0",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
+    "@types/express": "^4.17.12",
+    "@types/gm": "^1.18.9",
+    "@types/node": "^15.12.4",
+    "@types/node-cleanup": "^2.1.1",
+    "@types/ws": "^7.4.5",
+    "@types/xml2js": "^0.4.8",
     "eslint": "^7.3.1",
     "jest": "^26.6.3",
     "prettier": "^2.0.5"

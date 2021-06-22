@@ -1,2 +1,2 @@
-const Application = require('./constructors/Application');
-module.exports = new Application(require('./config'));
+const Application = require('./dist/Application');
+module.exports = new Application.default(require('./config'));

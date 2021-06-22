@@ -1,29 +1,54 @@
 # pixels-web-api
-Web API for Artboard (Pixels).
+Web API for Artboard (fka Pixels).
 
-## Notice
-History files before 01/06/2021 used FastIntCompression library, which had to be
-replaced due to save data corruption. History files that were created after this
-date use JSON.
+## Setup
 
-## Configuration
-See `config.example.js`.
+### Configuration
+See `config.example.js`. Please make sure that every value that is in the configuration
+corresponds to types of the same value in the configuration example.
+
+In case of errors in the types of one of the values in the configuration, the
+application will spew out an AssertionError, that provides where exactly was the
+error made.
+
+### Running
+```bash
+# Install dependencies, including developer ones
+npm install --save-dev
+
+# Compile TypeScript code
+npm run build:ts
+
+# Minify JavaScript with Closure Compiler
+npm run build:web
+
+# Start up the application
+npm start
+```
+
+There's a file named `ecosystem.config.js`, that is specifically made for [PM2](https://pm2.keymetrics.io/)
+process. **Before running, do not forget to do the first 3 steps above.**
+```bash
+pm2 startOrReload ecosystem.config.js
+```
 
 ## Websocket
 This software hosts a WebSocket server to communicate with Meta Construct servers and
-website clients. There is no OP code that is specially made for pinging to keep the
-connection alive, but you can send garbage data to the server instead, because the
-server doesn't check if the data is JSON or if the sent OP code exists or not.
+website clients.
 
 ### Payloads
 Every payload should be in JSON format.
 
 ```json
 {
-  "op": "opCode",           // string, OP code
-  "data": "Hello, world!",  // any   , OP code data/argument(s)
+  "op": "opCode",           // string,  OP code,                  required
+  "data": "Hello, world!",  // any,     OP code data/argument(s), optional
 }
 ```
+
+If the client sends a payload, that does not follow the payload example above, the
+connection between the client and the server will be closed with code `1007` (unsupported
+payload).
 
 ### Write access
 Clients, whose IP addresses are in configuration property `writeIPs` have write access.
@@ -33,7 +58,7 @@ This means that they can edit image data by sending `addPixel` payloads.
 
 #### `addPixel`
 This OP code is responsible for modifying the image data when sent to the server and
-notifying that the image data was edited by receiving from the server. 
+notifying that the image data was edited by receiving from the server.
 
 ##### Example payload
 ```json
@@ -54,7 +79,7 @@ successfully sent, clients should receive `addPixel` OP code in return with the 
 arguments as the sent payload.
 
 #### `imageInfo`
-This OP code is sent from the server to the clients who just connected. It contains 
+This OP code is sent from the server to the clients who just connected. It contains
 image and palette data.
 
 ##### Example payload
