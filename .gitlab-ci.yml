@@ -17,7 +17,7 @@ stages:
 
 test:
   stage: test
-  image: node:13.14.0 # current version installed on 3k
+  image: node:16.3.0 # current version installed on 3k
   script:
     - npm install
     - npx eslint . && npm run test
