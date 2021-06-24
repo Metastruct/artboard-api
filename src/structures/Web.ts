@@ -99,7 +99,7 @@ export default class Web extends BaseEventEmitterStructure {
         request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length)
       ) !== -1;
     socket.sendPayload('writeAccess', socket.hasWriteAccess);
-    socket.emit('connection', socket);
+    this.emit('connection', socket);
     socket.on('message', (data: Data) => {
       try {
         const parsed = JSON.parse(data.toString());
