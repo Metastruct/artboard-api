@@ -22,7 +22,7 @@ export default class Activity extends BaseActivity {
       const compressed = JSON.stringify(Game.image);
       writeFileSync(historyPath, compressed);
 
-      await Renderer.renderGIF();
+      await Renderer.createGIF();
       await Game.createImage();
       Web.broadcast('imageReset');
       Game.executeWebhook();
