@@ -1,5 +1,5 @@
 import { readdirSync } from 'fs';
-import * as cleanup from 'node-cleanup';
+import cleanup from 'node-cleanup';
 
 import { REGEX_FILENAME } from './utilities';
 

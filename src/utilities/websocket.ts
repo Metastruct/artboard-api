@@ -1,10 +1,10 @@
 import { createHash } from 'crypto';
 import { IncomingMessage } from 'http';
 import { Socket } from 'net';
-import * as ws from 'ws';
+import ws from 'ws';
 import { GUID, kWebSocket } from 'ws/lib/constants';
 import { format } from 'ws/lib/extension';
-import * as PerMessageDeflate from 'ws/lib/permessage-deflate';
+import PerMessageDeflate from 'ws/lib/permessage-deflate';
 
 export class WebSocket extends ws {
   public hasWriteAccess = false;

@@ -1,7 +1,7 @@
 import { Canvas, NodeCanvasRenderingContext2D } from 'canvas';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { createWriteStream, readdirSync, unlinkSync } from 'fs';
-import * as gm from 'gm';
+import gm from 'gm';
 
 import Application from '../Application';
 import { BaseStructure } from '../foundation/BaseStructure';
