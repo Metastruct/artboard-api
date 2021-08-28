@@ -1,4 +1,4 @@
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { existsSync, writeFileSync } from 'fs';
 
 import BaseActivity from '../foundation/BaseActivity';
@@ -23,7 +23,7 @@ export default class Activity extends BaseActivity {
       writeFileSync(historyPath, compressed);
 
       await Renderer.createGIF();
-      await Game.createImage();
+      await Game.createEmptyImage();
       Web.broadcast('imageReset');
       Game.executeWebhook();
     }

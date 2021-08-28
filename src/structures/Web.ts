@@ -1,7 +1,7 @@
 /// <reference path="Web.d.ts" />
 import axios from 'axios';
-import * as dayjs from 'dayjs';
-import * as express from 'express';
+import dayjs from 'dayjs';
+import express from 'express';
 import { createServer, IncomingMessage, Server } from 'http';
 import { resolve } from 'path';
 import { Data } from 'ws';

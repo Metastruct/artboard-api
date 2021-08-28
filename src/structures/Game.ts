@@ -1,7 +1,7 @@
 /// <reference path="Game.d.ts" />
 import axios from 'axios';
 import { hex2Rgb } from 'colorsys';
-import * as FormData from 'form-data';
+import FormData from 'form-data';
 import { createReadStream, readFileSync, writeFileSync } from 'fs';
 
 import Application from '../Application';
