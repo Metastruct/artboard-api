@@ -1,8 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
 body { 
   margin: 0;
   overflow: hidden;
   font-size: 18px;
-  font-family: sans-serif;
+  font-family: "Roboto Mono", monospace;
   background: url(/darknoise.png);
 }
 
@@ -59,4 +61,9 @@ body {
   display: block;
   color: #BFBFBF;
   text-decoration: none;
+  font-size: 16px;
+}
+
+.logo {
+  margin: 16px;
 }

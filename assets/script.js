@@ -39,32 +39,27 @@ class Artboard {
       () => (this.isDragging = false)
     );
     window.addEventListener('mousedown', (e) => {
+      const relatedToInfoElem = e.target === this.infoElem ||
+        e.target.parentNode === this.infoElem;
+      if (relatedToInfoElem) return;
+
       this.velocity = [0, 0];
       this.isDragging = true;
       this.oldMouseCoords = [e.clientX, e.clientY];
     });
     window.addEventListener('mousemove', (e) => {
+      const relatedToInfoElem = e.target === this.infoElem ||
+        e.target.parentNode === this.infoElem;
+      if (!this.isDragging && relatedToInfoElem) return;
+
       this.mouseCoords = [e.clientX, e.clientY];
-      if (this.isDragging) {
-        const dx = e.clientX - this.oldMouseCoords[0],
-          dy = e.clientY - this.oldMouseCoords[1];
-
-        this.offsetCoords[0] += dx;
-        this.offsetCoords[1] += dy;
-
-        const [x1, y1] = this.oldMouseCoords;
-        const [x2, y2] = this.mouseCoords;
-        this.speed = [x2 - x1, y2 - y1];
-
-        this.oldMouseCoords = [e.clientX, e.clientY];
-      }
     });
     window.addEventListener('wheel', ({ x, y, deltaY }) => {
       const { width, height } = this.canvasElem;
 
       const direction = deltaY > 0 ? -1 : 1;
-      const size = direction * 0.5;
-      if (this.size + size <= 0.2) return;
+      const size = direction * 0.25 * this.size;
+      if (this.size + size <= 0.2 || this.size + size >= 64) return;
 
       const wx = (x - this.offsetCoords[0]) / (width * this.size);
       const wy = (y - this.offsetCoords[1]) / (height * this.size);
@@ -79,7 +74,7 @@ class Artboard {
 
   getSteamNameAvatar(sid) {
     if (this.cache[sid]) return this.cache[sid];
-    this.cache[sid] = { avatar: '', nickname: 'loading...' };
+    this.cache[sid] = { avatar: '', nickname: 'Loading...' };
 
     let xhr = new XMLHttpRequest();
     xhr.open('GET', `http://${document.location.host}/get/${sid}`);
@@ -135,7 +130,7 @@ class Artboard {
   }
 
   /**
-   * Shut up.
+   * nightmare nightmare nightmare
    * @suppress {misplacedTypeAnnotation}
    */
   processReceivedMessage(received) {
@@ -193,7 +188,25 @@ class Artboard {
   }
 
   updateVelocity() {
-    if (this.isDragging) return;
+    if (this.isDragging) {
+      if (this.mouseCoords !== this.oldMouseCoords) {
+        const [cx, cy] = this.mouseCoords;
+        const dx = cx - this.oldMouseCoords[0],
+          dy = cy - this.oldMouseCoords[1];
+
+        this.offsetCoords[0] += dx;
+        this.offsetCoords[1] += dy;
+
+        const [x1, y1] = this.oldMouseCoords;
+        const [x2, y2] = this.mouseCoords;
+        this.speed = [x2 - x1, y2 - y1];
+
+        this.oldMouseCoords = [cx, cy];
+      } else
+        this.speed = [0, 0];
+
+      return;
+    }
 
     this.velocity[0] += this.speed[0];
     this.velocity[1] += this.speed[1];
@@ -227,7 +240,8 @@ class Artboard {
     if (!mouseCoords) return;
 
     const elem = document.elementFromPoint(mouseCoords[0], mouseCoords[1]);
-    if (elem === infoElem && infoElem.className.indexOf('hidden') < 0) return;
+    if (!this.isDragging && elem === infoElem && infoElem.className.indexOf('hidden') < 0)
+      return;
 
     const mx = Math.floor((mouseCoords[0] - offsetCoords[0]) / this.size),
       my = Math.floor((mouseCoords[1] - offsetCoords[1]) / this.size);
@@ -250,7 +264,7 @@ class Artboard {
   renderImage() {
     if (!this.image || !this.palette)
       return console.error(
-        'renderImage() was called when image or palette was not present'
+        'renderImage() was called when the image or the palette were not present'
       );
 
     this.externalCanvas.width = this.imageWidth;
