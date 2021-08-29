@@ -143,11 +143,13 @@ class Artboard {
     const { op, data } = msg;
 
     switch (op) {
-      case 'imageInfo':
-        const { palette, image, steamIDs } = /** @type {ImageInfo} */ data;
+      case 'imageData':
+        const { palette, image, steamIDs, dimensions } = /** @type {ImageInfo} */ data;
         this.palette = palette;
         this.image = image;
         this.steamIDs = steamIDs;
+        this.imageWidth = dimensions[0];
+        this.imageHeight = dimensions[1];
         break;
       case 'addPixel':
         const { xy, color, steamId } = /** @type {AddPixel} */ data;

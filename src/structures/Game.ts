@@ -168,7 +168,7 @@ export default class Game extends BaseStructure {
     }
 
     const { dimensions, image, banned, steamIDs, palette, timeoutTime } = this;
-    this.application.structures.Web.broadcast('imageInfo', {
+    this.application.structures.Web.broadcast('imageData', {
       dimensions,
       image,
       banned,

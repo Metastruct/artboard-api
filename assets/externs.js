@@ -13,6 +13,8 @@ ImageInfo.prototype.palette;
 ImageInfo.prototype.image;
 /** @type {Array} */
 ImageInfo.prototype.steamIDs;
+/** @type {Array} */
+ImageInfo.prototype.dimensions;
 
 /** @interface */
 function AddPixel() {}
