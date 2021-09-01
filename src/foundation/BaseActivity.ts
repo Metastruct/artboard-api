@@ -1,16 +1,18 @@
+import schedule from 'node-schedule';
+
 import Application from '../Application';
 
 export default class BaseActivity {
   public readonly application: Application;
-  public readonly rate: number = 5000;
-  public readonly runOnInit: boolean = false;
+  public readonly rule: string = '* * * * *';
+  private job: schedule.Job;
 
   constructor(application: Application) {
     this.application = application;
   }
 
   public activate() {
-    if (this.runOnInit) this.run();
+    this.job = schedule.scheduleJob(this.rule, () => this.run());
   }
 
   public run() {}

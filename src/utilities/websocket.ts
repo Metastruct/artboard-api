@@ -93,3 +93,10 @@ export class WebSocketServer extends ws.Server {
 }
 
 export const WEBSOCKET_UNSUPPORTED_PAYLOAD = 1007;
+export enum WEBSOCKET_EVENTS {
+  ADD_PIXEL = 'addPixel',
+  EXECUTE_TIMEOUT = 'executeTimeout',
+  IMAGE_DATA = 'imageData',
+  IMAGE_RESET = 'imageReset',
+  IMAGE_UPDATE = 'imageUpdate'
+}
