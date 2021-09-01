@@ -4,6 +4,7 @@ export {
   WebSocket,
   WebSocketServer,
   WEBSOCKET_UNSUPPORTED_PAYLOAD,
+  WEBSOCKET_EVENTS
 } from './websocket';
 
 export const FRAME_DATE_FORMAT = 'MM-DD-YY-HH';

@@ -6,7 +6,7 @@ import { createReadStream, readFileSync, writeFileSync } from 'fs';
 
 import Application from '../Application';
 import { BaseStructure } from '../foundation/BaseStructure';
-import { LOSPEC_RANDOM_ENDPOINT, SAVE_FILENAME, WebSocket } from '../utilities';
+import { LOSPEC_RANDOM_ENDPOINT, SAVE_FILENAME, WebSocket, WEBSOCKET_EVENTS } from '../utilities';
 
 export default class Game extends BaseStructure {
   public image?: Array<number>;
@@ -51,7 +51,7 @@ export default class Game extends BaseStructure {
         palette,
         timeoutTime,
       } = this;
-      socket.sendPayload('imageData', {
+      socket.sendPayload(WEBSOCKET_EVENTS.IMAGE_DATA, {
         dimensions,
         image,
         banned,
@@ -62,7 +62,7 @@ export default class Game extends BaseStructure {
     });
 
     this.application.structures.Web.on(
-      'm_addPixel',
+      'm_' + WEBSOCKET_EVENTS.ADD_PIXEL,
       (
         socket: WebSocket,
         { pixels, steamId, x, y, color }: IWebSocketAddPixelEventData
@@ -103,12 +103,12 @@ export default class Game extends BaseStructure {
     this.steamIDs[xy] = steamID;
     this.timeouts[steamID] = Date.now();
 
-    this.application.structures.Web.broadcast('addPixel', {
+    this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.ADD_PIXEL, {
       xy,
       color,
       steamID,
     });
-    this.application.structures.Web.broadcast('executeTimeout', steamID);
+    this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.EXECUTE_TIMEOUT, steamID);
   }
 
   private addPixels(pixels: Record<string, number>, steamID: string) {
@@ -135,11 +135,11 @@ export default class Game extends BaseStructure {
     this.steamIDs = steamIDsCopy;
     this.timeouts[steamID] = Date.now();
 
-    this.application.structures.Web.broadcast('imageUpdate', {
+    this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.IMAGE_UPDATE, {
       image: this.image,
       diff: pixels,
     });
-    this.application.structures.Web.broadcast('executeTimeout', steamID);
+    this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.EXECUTE_TIMEOUT, steamID);
   }
 
   private async getRandomPalette() {
@@ -168,7 +168,7 @@ export default class Game extends BaseStructure {
     }
 
     const { dimensions, image, banned, steamIDs, palette, timeoutTime } = this;
-    this.application.structures.Web.broadcast('imageData', {
+    this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.IMAGE_DATA, {
       dimensions,
       image,
       banned,
