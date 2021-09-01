@@ -7,7 +7,7 @@
     "test": "jest",
     "start": "node index.js",
     "build:web": "cd assets && npx google-closure-compiler -O ADVANCED --externs externs.js --js script.js --js_output_file static/script.js",
-    "build:ts": "tsc"
+    "build:ts": "rm -rf ./dist/ && tsc"
   },
   "repository": {
     "type": "git",
