@@ -39,7 +39,7 @@ website clients.
 ### Payloads
 Every payload should be in JSON format.
 
-```json
+```jsonc
 {
   "op": "opCode",           // string,  OP code,                  required
   "data": "Hello, world!",  // any,     OP code data/argument(s), optional
