@@ -81,7 +81,7 @@ export default class Game extends BaseStructure {
   private isSteamIDAllowedToDraw(steamID: string) {
     const timeout = this.timeouts[steamID];
     if (
-      typeof this.banned[steamID] !== 'undefined' ||
+      this.banned[steamID] !== undefined ||
       (timeout && Date.now() - timeout < this.timeoutTime)
     )
       return false;
