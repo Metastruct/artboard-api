@@ -1,4 +1,4 @@
-import { Canvas, NodeCanvasRenderingContext2D } from 'canvas';
+import { Canvas, CanvasRenderingContext2D } from 'canvas';
 import dayjs from 'dayjs';
 import { createWriteStream, readdirSync, unlinkSync } from 'fs';
 import gm from 'gm';
@@ -9,7 +9,7 @@ import { FRAME_DATE_FORMAT } from '../utilities';
 
 export default class Renderer extends BaseStructure {
   private readonly canvas: Canvas;
-  private readonly ctx: NodeCanvasRenderingContext2D;
+  private readonly ctx: CanvasRenderingContext2D;
   private readonly pixelSize: number;
 
   constructor(application: Application) {
