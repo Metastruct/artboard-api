@@ -96,7 +96,7 @@ export default class Web extends BaseEventEmitterStructure {
   ) {
     socket.hasWriteAccess =
       this.writeIPs.indexOf(
-        (request.headers['x-forwarded-for'][0] || request.socket.remoteAddress).substring(REMOTE_ADDRESS_PREFIX.length)
+        request.headers['x-forwarded-for'][0] || request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length)
       ) !== -1;
     socket.sendPayload('writeAccess', socket.hasWriteAccess);
     this.emit('connection', socket);
