@@ -27,7 +27,6 @@
     "express": "^4.17.1",
     "form-data": "^3.0.0",
     "gm": "^1.23.1",
-    "node-cleanup": "^2.1.2",
     "node-schedule": "^2.0.0",
     "ws": "^7.3.0",
     "xml2js": "^0.4.23"
