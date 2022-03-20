@@ -100,7 +100,8 @@ export default class Web extends BaseEventEmitterStructure {
 
     // Assuming the IP that we want is the first.
     const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded)
-      || request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length)
+      || request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length);
+    console.log('Remote address:', request.socket.remoteAddress);
     socket.hasWriteAccess = this.writeIPs.indexOf(ip) !== -1;
     console.log('New connection to WS:', ip);
     socket.sendPayload('writeAccess', socket.hasWriteAccess);
