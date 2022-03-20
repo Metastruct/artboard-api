@@ -23,13 +23,17 @@ export default class Application {
       (v) => v.onImportDone()
     );
 
-    ['SIGINT', 'SIGTERM'].forEach(
+    ['SIGINT', 'SIGTERM', 'beforeExit'].forEach(
       signal =>
-        process.on(signal, () => {
+        process.on(signal, async () => {
           console.log(signal + ' received! Preparing before shutdown...');
-          Object.values(this.structures).forEach(
-            (v) => v.onCleanup()
+          await Promise.all(
+            Object.values(this.structures).map(
+              (v) => v.onCleanup()
+            )
           );
+          console.log('Bye!');
+          process.exit(0);
         })
     );
   }

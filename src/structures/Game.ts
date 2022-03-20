@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { hex2Rgb } from 'colorsys';
 import FormData from 'form-data';
-import { createReadStream, readFileSync, writeFileSync } from 'fs';
+import { createReadStream, promises } from 'fs';
 
 import Application from '../Application';
 import { BaseStructure } from '../foundation/BaseStructure';
@@ -74,8 +74,8 @@ export default class Game extends BaseStructure {
     );
   }
 
-  public onCleanup() {
-    this.saveImage();
+  public async onCleanup() {
+    await this.saveImage();
   }
 
   private isSteamIDAllowedToDraw(steamID: string) {
@@ -178,9 +178,9 @@ export default class Game extends BaseStructure {
     });
   }
 
-  private loadImage() {
+  private async loadImage() {
     try {
-      const buf = readFileSync(SAVE_FILENAME);
+      const buf = await promises.readFile(SAVE_FILENAME);
       const { image, palette, steamIDs } = JSON.parse(buf.toString());
 
       this.image = image;
@@ -193,14 +193,14 @@ export default class Game extends BaseStructure {
     if (!this.image || this.image.length == 0) this.createEmptyImage();
   }
 
-  private saveImage() {
+  private async saveImage() {
     const { image, palette, steamIDs } = this;
     const json = JSON.stringify({
       image,
       palette,
       steamIDs,
     });
-    writeFileSync(SAVE_FILENAME, json);
+    await promises.writeFile(SAVE_FILENAME, json);
   }
 
   public executeWebhook() {
