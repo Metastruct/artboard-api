@@ -90,21 +90,25 @@ export default class Web extends BaseEventEmitterStructure {
     res.send(data);
   }
 
+  private isLocal(ip: string) {
+    const parts = ip.split('.');
+    return parts[0] === '10' ||
+      (parts[0] === '172' && (parseInt(parts[1], 10) >= 16 && parseInt(parts[1], 10) <= 31)) ||
+      (parts[0] === '192' && parts[1] === '168');
+  }
+
   private handleWebSocketConnection(
     socket: WebSocket,
     request: IncomingMessage
   ) {
     const forwarded = request.headers['x-forwarded-for'] as (string[] | string);
 
-    console.log(request.headers);
-    console.log('Forwarded IP(s):', forwarded);
-
     // Assuming the IP that we want is the first.
-    const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded)
-      || request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length);
-    console.log('Remote address:', request.socket.remoteAddress);
-    socket.hasWriteAccess = this.writeIPs.indexOf(ip) !== -1;
+    const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded) ||
+      request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length);
+    socket.hasWriteAccess = this.writeIPs.indexOf(ip) !== -1 || this.isLocal(ip);
     console.log('New connection to WS:', ip);
+
     socket.sendPayload('writeAccess', socket.hasWriteAccess);
     this.emit('connection', socket);
     socket.on('message', (data: Data) => {
