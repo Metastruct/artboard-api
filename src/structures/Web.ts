@@ -96,6 +96,8 @@ export default class Web extends BaseEventEmitterStructure {
   ) {
     const forwarded = request.headers['x-forwarded-for'] as (string[] | string);
 
+    console.log('Forwarded IP(s):', forwarded);
+
     // Assuming the IP that we want is the first.
     const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded)
       || request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length)
