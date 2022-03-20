@@ -96,6 +96,7 @@ export default class Web extends BaseEventEmitterStructure {
   ) {
     const forwarded = request.headers['x-forwarded-for'] as (string[] | string);
 
+    console.log(request.headers);
     console.log('Forwarded IP(s):', forwarded);
 
     // Assuming the IP that we want is the first.
