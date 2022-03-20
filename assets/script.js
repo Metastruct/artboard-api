@@ -77,7 +77,7 @@ class Artboard {
     this.cache[sid] = { avatar: '', nickname: 'Loading...' };
 
     let xhr = new XMLHttpRequest();
-    xhr.open('GET', `http://${document.location.host}/get/${sid}`);
+    xhr.open('GET', `https://${document.location.host}/get/${sid}`);
     xhr.send();
     xhr.onload = () => {
       if (xhr.readyState === xhr.DONE && xhr.status === 200)
