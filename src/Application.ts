@@ -1,5 +1,4 @@
 import { readdirSync } from 'fs';
-import cleanup from 'node-cleanup';
 
 import { REGEX_FILENAME } from './utilities';
 
@@ -21,7 +20,17 @@ export default class Application {
     }
 
     Object.values(this.structures).forEach(
-      (v) => (v.onImportDone(), cleanup(() => v.onCleanup()))
+      (v) => v.onImportDone()
+    );
+
+    ['SIGINT', 'SIGTERM'].forEach(
+      signal =>
+        process.on(signal, () => {
+          console.log(signal + ' received! Preparing before shutdown...');
+          Object.values(this.structures).forEach(
+            (v) => v.onCleanup()
+          );
+        })
     );
   }
 }
