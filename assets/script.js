@@ -100,7 +100,7 @@ class Artboard {
 
   openConnection(i = 0) {
     /** @suppress {checkTypes} */
-    this.ws = new WebSocket(`ws://${document.location.host}:10010/`);
+    this.ws = new WebSocket(`wss://${document.location.host}/`);
 
     this.ws.addEventListener('error', (e) => {
       this.error(true, 'Error occurred!');
