@@ -2,6 +2,10 @@ name: CI
 
 on: [push]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -28,12 +32,22 @@ jobs:
       - name: Docker Login
         uses: docker/login-action@v1.14.1
         with:
-          registry: ghcr.io
-          username: ${{secrets.CR_USER}}
-          password: ${{secrets.CR_PAT}}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+       - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v2.9.0
         with:
+          context: .
           push: true
-          tags: ghcr.io/metastruct/artboard-api:latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
