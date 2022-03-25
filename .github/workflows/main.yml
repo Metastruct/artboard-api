@@ -5,6 +5,7 @@ on: [push]
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  DEFAULT_BRANCH: format('refs/heads/{0}', github.event.repository.default_branch)
 
 jobs:
   test:
@@ -36,18 +37,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-       - name: Extract metadata (tags, labels) for Docker
+      - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v3
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
+            type=raw,value=latest,enable=${{ github.ref == env.DEFAULT_BRANCH }}
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v2.9.0
         with:
           context: .
-          push: true
+          push: ${{ github.ref == env.DEFAULT_BRANCH }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
