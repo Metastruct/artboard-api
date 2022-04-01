@@ -17,14 +17,4 @@ module.exports = {
     semi: ['error', 'always'],
     'no-empty': ['error', { allowEmptyCatch: true }],
   },
-  overrides: [
-    {
-      files: [
-        '**/*.test.js',
-      ],
-      env: {
-        'jest': true,
-      },
-    },
-  ],
 };
