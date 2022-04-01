@@ -8,25 +8,7 @@ env:
   DEFAULT_BRANCH: ${{ format('refs/heads/{0}', github.event.repository.default_branch) }}
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Install Node.JS
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run linter and tests
-        run: npx eslint . && npm run test
-  build:
-    needs: test
+  build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
