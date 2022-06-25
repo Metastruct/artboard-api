@@ -1,4 +1,4 @@
-import { readdirSync } from 'fs';
+import { readdirSync, watch } from 'fs';
 
 import { REGEX_FILENAME } from './utilities';
 
@@ -6,8 +6,15 @@ export default class Application {
   public structures: Record<string, any> = {};
   public readonly config: IConfig;
 
-  constructor(config: IConfig) {
-    this.config = config;
+  constructor(config: IConfig | string) {
+    if (typeof config === 'string') {
+      this.config = require('../' + config.replace(REGEX_FILENAME, ''));
+      watch(config, (eventType) => {
+        if (eventType === 'change')
+          this.config = require('../' + config.replace(REGEX_FILENAME, ''));
+      });
+    } else
+      this.config = config;
     this.importStructures();
   }
 
