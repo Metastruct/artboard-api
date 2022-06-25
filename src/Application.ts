@@ -3,8 +3,8 @@ import { readdirSync, watch } from 'fs';
 import { REGEX_FILENAME } from './utilities';
 
 export default class Application {
+  public config: IConfig;
   public structures: Record<string, any> = {};
-  public readonly config: IConfig;
 
   constructor(config: IConfig | string) {
     if (typeof config === 'string') {
