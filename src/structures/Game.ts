@@ -173,7 +173,7 @@ export default class Game extends BaseStructure {
       this.image.push(-1);
     }
 
-    const { dimensions, image, banned, steamIDs, palette, timeoutTime } = this;
+    const { dimensions, image, banned, steamIDs, palette, paletteURL, timeoutTime } = this;
     this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.IMAGE_DATA, {
       dimensions,
       image,
