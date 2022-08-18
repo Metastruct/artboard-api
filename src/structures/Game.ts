@@ -145,7 +145,7 @@ export default class Game extends BaseStructure {
     this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.EXECUTE_TIMEOUT, steamID);
   }
 
-  private async getRandomPalette(): { palette: Array<Array<number>>, paletteURL: string } {
+  private async getRandomPalette(): Promise<{ palette: Array<Array<number>>, paletteURL: string }> {
     const { request } = await axios.get(LOSPEC_RANDOM_ENDPOINT);
     const paletteURL = request.res.responseUrl;
     const { data } = await axios(paletteURL + '.hex');
@@ -164,9 +164,9 @@ export default class Game extends BaseStructure {
   private async createEmptyImage() {
     this.image = [];
     this.steamIDs = [];
-    const { palette, paletteURL } = await this.getRandomPalette();
-    this.palette = palette;
-    this.paletteURL = paletteURL;
+    const response = await this.getRandomPalette();
+    this.palette = response.palette;
+    this.paletteURL = response.paletteURL;
 
     let space = this.dimensions[0] * this.dimensions[1] - 1;
     for (let i = 1; i <= space; i++) {
@@ -202,7 +202,7 @@ export default class Game extends BaseStructure {
   }
 
   private async saveImage() {
-    const { image, palette, steamIDs } = this;
+    const { image, palette, paletteURL, steamIDs } = this;
     const json = JSON.stringify({
       image,
       palette,
