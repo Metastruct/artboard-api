@@ -12,6 +12,7 @@ export default class Game extends BaseStructure {
   public image?: Array<number>;
   public palette?: Array<Array<number>>;
   public readonly dimensions: Array<number>;
+  private paletteURL?: string;
   private steamIDs?: Array<string>;
   private timeouts: Record<string, number> = {};
   private readonly banned?: Record<string, boolean>;
@@ -49,6 +50,7 @@ export default class Game extends BaseStructure {
         banned,
         steamIDs,
         palette,
+        paletteURL,
         timeoutTime,
       } = this;
       socket.sendPayload(WEBSOCKET_EVENTS.IMAGE_DATA, {
@@ -57,6 +59,7 @@ export default class Game extends BaseStructure {
         banned,
         steamIDs,
         palette,
+        paletteURL,
         timeoutTime,
       });
     });
@@ -142,9 +145,10 @@ export default class Game extends BaseStructure {
     this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.EXECUTE_TIMEOUT, steamID);
   }
 
-  private async getRandomPalette() {
+  private async getRandomPalette(): { palette: Array<Array<number>>, paletteURL: string } {
     const { request } = await axios.get(LOSPEC_RANDOM_ENDPOINT);
-    const { data } = await axios(request.res.responseUrl + '.hex');
+    const paletteURL = request.res.responseUrl;
+    const { data } = await axios(paletteURL + '.hex');
     let palette = [];
 
     for (const hex of data.split('\r\n')) {
@@ -154,13 +158,15 @@ export default class Game extends BaseStructure {
       } catch (err) {}
     }
 
-    return palette;
+    return { palette, paletteURL };
   }
 
   private async createEmptyImage() {
     this.image = [];
     this.steamIDs = [];
-    this.palette = await this.getRandomPalette();
+    const { palette, paletteURL } = await this.getRandomPalette();
+    this.palette = palette;
+    this.paletteURL = paletteURL;
 
     let space = this.dimensions[0] * this.dimensions[1] - 1;
     for (let i = 1; i <= space; i++) {
@@ -174,6 +180,7 @@ export default class Game extends BaseStructure {
       banned,
       steamIDs,
       palette,
+      paletteURL,
       timeoutTime,
     });
   }
@@ -181,10 +188,11 @@ export default class Game extends BaseStructure {
   private async loadImage() {
     try {
       const buf = await promises.readFile(SAVE_FILENAME);
-      const { image, palette, steamIDs } = JSON.parse(buf.toString());
+      const { image, palette, paletteURL, steamIDs } = JSON.parse(buf.toString());
 
       this.image = image;
       this.palette = palette;
+      this.paletteURL = paletteURL;
       this.steamIDs = steamIDs;
     } catch (err) {
       console.log('Image load failed.', err);
@@ -198,6 +206,7 @@ export default class Game extends BaseStructure {
     const json = JSON.stringify({
       image,
       palette,
+      paletteURL,
       steamIDs,
     });
     await promises.writeFile(SAVE_FILENAME, json);
