@@ -12,13 +12,17 @@ export default class ResetActivity extends BaseActivity {
 
     const historyPath = `history/hi-${dayjs().format(HISTORY_DATE_FORMAT)}.dat`;
     if (!existsSync(historyPath)) {
-      const compressed = JSON.stringify(Game.image);
+      const compressed = JSON.stringify({
+        palette: Game.palette,
+        image: Game.image,
+        steamIDs: Game.steamIDs
+      });
       writeFileSync(historyPath, compressed);
 
-      await Renderer.createGIF();
+      // await Renderer.createGIF();
       await Game.createEmptyImage();
       Web.broadcast('imageReset');
-      Game.executeWebhook();
+      // Game.executeWebhook();
     }
   }
 }
