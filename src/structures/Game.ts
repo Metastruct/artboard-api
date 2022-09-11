@@ -11,9 +11,9 @@ import { LOSPEC_RANDOM_ENDPOINT, SAVE_FILENAME, WebSocket, WEBSOCKET_EVENTS } fr
 export default class Game extends BaseStructure {
   public image?: Array<number>;
   public palette?: Array<Array<number>>;
+  public steamIDs?: Array<string>;
   public readonly dimensions: Array<number>;
   private paletteURL?: string;
-  private steamIDs?: Array<string>;
   private timeouts: Record<string, number> = {};
   private readonly banned?: Record<string, boolean>;
   private readonly timeoutTime?: number;

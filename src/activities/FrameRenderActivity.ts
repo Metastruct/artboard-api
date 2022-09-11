@@ -10,8 +10,8 @@ export default class FrameRenderActivity extends BaseActivity {
   public async run() {
     const { Renderer } = this.application.structures;
 
-    const date = dayjs().format(FRAME_DATE_FORMAT);
-    if (!existsSync(`assets/frames/frame_${date}.png`))
-      return Renderer.renderFrame();
+    // const date = dayjs().format(FRAME_DATE_FORMAT);
+    // if (!existsSync(`assets/frames/frame_${date}.png`))
+    //  return Renderer.renderFrame();
   }
 }
