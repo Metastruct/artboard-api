@@ -245,14 +245,37 @@ export default class Game extends BaseStructure {
       return false;
 
     const formData = new FormData();
-    formData.append('username', 'Artboard');
-    formData.append('avatar_url', this.application.config.host + '/icon.png');
-    formData.append('file', this.application.structures.Renderer.renderFrame());
+    formData.append(
+      'payload_json',
+      JSON.stringify({
+        username: 'Artboard',
+        avatar_url: this.application.config.host + '/icon.png',
+        embeds: [
+          {
+            image: { url: 'attachment://result.png' },
+          },
+        ],
+        attachments: [
+          {
+            id: 0,
+            filename: 'result.png',
+          },
+        ],
+      }),
+      { contentType: 'application/json' }
+    );
+    formData.append(
+      'files[0]',
+      this.application.structures.Renderer.renderFrame(),
+      { filename: 'result.png' }
+    );
 
     const formHeaders = formData.getHeaders();
 
-    axios.patch(`${this.webhookURL}/messages/${this.msgID}`, formData, {
-      headers: { ...formHeaders },
-    });
+    axios
+      .patch(`${this.webhookURL}/messages/${this.msgID}`, formData, {
+        headers: { ...formHeaders },
+      })
+      .catch(err => console.error(err));
   }
 }
