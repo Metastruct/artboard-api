@@ -255,10 +255,11 @@ export default class Game extends BaseStructure {
           {
             image: { url: 'attachment://result.png' },
             author: {
-              name: this.paletteURL.substring(
+              name: `Current Palette: ${this.paletteURL.substring(
                 this.paletteURL.lastIndexOf('/') + 1
-              ),
+              )}`,
               url: this.paletteURL,
+              icon_url: 'https://lospec.com/brand/lospec_logomark_3x.png',
             },
           },
         ],
