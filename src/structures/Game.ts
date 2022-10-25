@@ -250,6 +250,7 @@ export default class Game extends BaseStructure {
       JSON.stringify({
         username: 'Artboard',
         avatar_url: this.application.config.host + '/icon.png',
+        content: `[click here to view it on the website.](${this.application.config.host})`,
         embeds: [
           {
             image: { url: 'attachment://result.png' },
@@ -259,7 +260,6 @@ export default class Game extends BaseStructure {
               ),
               url: this.paletteURL,
             },
-            url: this.application.config.host,
           },
         ],
         attachments: [
