@@ -45,14 +45,14 @@ export default class Renderer extends BaseStructure {
       );
     });
 
-    const date = dayjs().format(FRAME_DATE_FORMAT);
+    // const date = dayjs().format(FRAME_DATE_FORMAT);
     const stream = this.canvas.createPNGStream();
     stream.on('error', err => console.error(err));
 
-    const out = createWriteStream(`assets/frames/frame_${date}.png`);
-    out.on('error', err => console.error(err));
+    // const out = createWriteStream(`assets/frames/frame_${date}.png`);
+    // out.on('error', err => console.error(err));
 
-    return stream.pipe(out);
+    return stream;
   }
 
   public async createGIF() {
