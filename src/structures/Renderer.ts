@@ -47,10 +47,10 @@ export default class Renderer extends BaseStructure {
 
     const date = dayjs().format(FRAME_DATE_FORMAT);
     const stream = this.canvas.createPNGStream();
-    stream.on('error', (err) => console.error(err));
+    stream.on('error', err => console.error(err));
 
     const out = createWriteStream(`assets/frames/frame_${date}.png`);
-    out.on('error', (err) => console.error(err));
+    out.on('error', err => console.error(err));
 
     return stream.pipe(out);
   }
@@ -64,7 +64,7 @@ export default class Renderer extends BaseStructure {
       .resize(width / 2, height / 2);
 
     await new Promise((res, rej) => {
-      gif.write('assets/static/result.gif', (err) => {
+      gif.write('assets/static/result.gif', err => {
         if (err) rej(err);
         res(true);
       });

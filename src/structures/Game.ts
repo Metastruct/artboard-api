@@ -1,4 +1,3 @@
-/// <reference path="Game.d.ts" />
 import axios from 'axios';
 import { hex2Rgb } from 'colorsys';
 import FormData from 'form-data';
@@ -6,8 +5,20 @@ import { createReadStream, promises } from 'fs';
 
 import Application from '../Application';
 import { BaseStructure } from '../foundation/BaseStructure';
-import { LOSPEC_RANDOM_ENDPOINT, SAVE_FILENAME, WebSocket, WEBSOCKET_EVENTS } from '../utilities';
+import {
+  LOSPEC_RANDOM_ENDPOINT,
+  SAVE_FILENAME,
+  WebSocket,
+  WEBSOCKET_EVENTS,
+} from '../utilities';
 
+interface IWebSocketAddPixelEventData {
+  x?: number;
+  y?: number;
+  pixels?: Record<string, number>;
+  color?: number;
+  steamId: string;
+}
 export default class Game extends BaseStructure {
   public image?: Array<number>;
   public palette?: Array<Array<number>>;
@@ -28,12 +39,8 @@ export default class Game extends BaseStructure {
       webhookURL: 'string?',
     });
 
-    const {
-      banned,
-      dimensions,
-      timeoutTime,
-      webhookURL,
-    } = this.application.config;
+    const { banned, dimensions, timeoutTime, webhookURL } =
+      this.application.config;
     this.banned = banned || {};
     this.dimensions = dimensions;
     this.timeoutTime = timeoutTime;
@@ -111,14 +118,17 @@ export default class Game extends BaseStructure {
       color,
       steamID,
     });
-    this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.EXECUTE_TIMEOUT, steamID);
+    this.application.structures.Web.broadcast(
+      WEBSOCKET_EVENTS.EXECUTE_TIMEOUT,
+      steamID
+    );
   }
 
   private addPixels(pixels: Record<string, number>, steamID: string) {
     if (!this.isSteamIDAllowedToDraw(steamID)) return;
 
-    let imageCopy = this.image;
-    let steamIDsCopy = this.steamIDs;
+    const imageCopy = this.image;
+    const steamIDsCopy = this.steamIDs;
 
     for (const position in pixels) {
       const color = pixels[position] - 1;
@@ -142,14 +152,20 @@ export default class Game extends BaseStructure {
       image: this.image,
       diff: pixels,
     });
-    this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.EXECUTE_TIMEOUT, steamID);
+    this.application.structures.Web.broadcast(
+      WEBSOCKET_EVENTS.EXECUTE_TIMEOUT,
+      steamID
+    );
   }
 
-  private async getRandomPalette(): Promise<{ palette: Array<Array<number>>, paletteURL: string }> {
+  private async getRandomPalette(): Promise<{
+    palette: Array<Array<number>>;
+    paletteURL: string;
+  }> {
     const { request } = await axios.get(LOSPEC_RANDOM_ENDPOINT);
     const paletteURL = request.res.responseUrl;
     const { data } = await axios(paletteURL + '.hex');
-    let palette = [];
+    const palette = [];
 
     for (const hex of data.split('\r\n')) {
       try {
@@ -168,12 +184,20 @@ export default class Game extends BaseStructure {
     this.palette = response.palette;
     this.paletteURL = response.paletteURL;
 
-    let space = this.dimensions[0] * this.dimensions[1] - 1;
+    const space = this.dimensions[0] * this.dimensions[1] - 1;
     for (let i = 1; i <= space; i++) {
       this.image.push(-1);
     }
 
-    const { dimensions, image, banned, steamIDs, palette, paletteURL, timeoutTime } = this;
+    const {
+      dimensions,
+      image,
+      banned,
+      steamIDs,
+      palette,
+      paletteURL,
+      timeoutTime,
+    } = this;
     this.application.structures.Web.broadcast(WEBSOCKET_EVENTS.IMAGE_DATA, {
       dimensions,
       image,
@@ -188,7 +212,9 @@ export default class Game extends BaseStructure {
   private async loadImage() {
     try {
       const buf = await promises.readFile(SAVE_FILENAME);
-      const { image, palette, paletteURL, steamIDs } = JSON.parse(buf.toString());
+      const { image, palette, paletteURL, steamIDs } = JSON.parse(
+        buf.toString()
+      );
 
       this.image = image;
       this.palette = palette;

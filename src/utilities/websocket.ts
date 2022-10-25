@@ -20,12 +20,12 @@ export class WebSocketServer extends ws.Server {
   // override the entire function to use an extended WebSocket class
   // from https://github.com/websockets/ws/blob/master/lib/websocket-server.js#L261
   private completeUpgrade(
-    key: String,
+    key: string,
     extensions: Record<string, any>,
     req: IncomingMessage,
     socket: Socket,
     head: Buffer,
-    cb: Function
+    cb: (arg0: any, arg1: IncomingMessage) => void
   ) {
     if (!socket.readable || !socket.writable) return socket.destroy();
 
@@ -98,5 +98,5 @@ export enum WEBSOCKET_EVENTS {
   EXECUTE_TIMEOUT = 'executeTimeout',
   IMAGE_DATA = 'imageData',
   IMAGE_RESET = 'imageReset',
-  IMAGE_UPDATE = 'imageUpdate'
+  IMAGE_UPDATE = 'imageUpdate',
 }

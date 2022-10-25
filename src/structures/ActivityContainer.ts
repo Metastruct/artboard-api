@@ -15,7 +15,7 @@ export default class ActivityContainer extends BaseStructure {
   }
 
   public onImportDone() {
-    this.activities.forEach((x) => x.activate());
+    this.activities.forEach(x => x.activate());
   }
 
   private async importActivities() {
