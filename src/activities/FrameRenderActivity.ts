@@ -5,7 +5,7 @@ import BaseActivity from '../foundation/BaseActivity';
 import { FRAME_DATE_FORMAT } from '../utilities';
 
 export default class FrameRenderActivity extends BaseActivity {
-  public rule = '0 * * * *';
+  public rule = '* * * * *';
 
   public async run() {
     const { Game, Renderer } = this.application.structures;
