@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { hex2Rgb } from 'colorsys';
 import FormData from 'form-data';
-import { createReadStream, promises } from 'fs';
+import { promises } from 'fs';
 
 import Application from '../Application';
 import { BaseStructure } from '../foundation/BaseStructure';
@@ -29,6 +29,7 @@ export default class Game extends BaseStructure {
   private readonly banned?: Record<string, boolean>;
   private readonly timeoutTime?: number;
   private readonly webhookURL: string;
+  private readonly msgID: string;
 
   constructor(application: Application) {
     super(application, {
@@ -39,12 +40,13 @@ export default class Game extends BaseStructure {
       webhookURL: 'string?',
     });
 
-    const { banned, dimensions, timeoutTime, webhookURL } =
+    const { banned, dimensions, timeoutTime, webhookURL, msgID } =
       this.application.config;
     this.banned = banned || {};
     this.dimensions = dimensions;
     this.timeoutTime = timeoutTime;
     this.webhookURL = webhookURL;
+    this.msgID = msgID;
 
     this.loadImage();
   }
@@ -239,13 +241,18 @@ export default class Game extends BaseStructure {
   }
 
   public executeWebhook() {
-    if (!this.webhookURL || !this.application.config.host) return false;
+    if (!this.webhookURL || !this.application.config.host || !this.msgID)
+      return false;
 
     const formData = new FormData();
     formData.append('username', 'Artboard');
     formData.append('avatar_url', this.application.config.host + '/icon.png');
-    formData.append('file', createReadStream('assets/static/result.gif'));
+    formData.append('file', this.application.structures.Renderer.renderFrame());
 
-    return formData.submit(this.webhookURL);
+    const formHeaders = formData.getHeaders();
+
+    axios.patch(`${this.webhookURL}/messages/${this.msgID}`, formData, {
+      headers: { ...formHeaders },
+    });
   }
 }

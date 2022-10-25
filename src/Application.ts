@@ -8,6 +8,7 @@ interface IConfig {
   host: string;
   timeoutTime: number;
   webhookURL?: string;
+  msgID?: string;
 
   pixelRenderSize: number;
 
