@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { EventEmitter } from 'events';
 
 import Application from '../Application';

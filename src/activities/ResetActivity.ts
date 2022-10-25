@@ -15,7 +15,7 @@ export default class ResetActivity extends BaseActivity {
       const compressed = JSON.stringify({
         palette: Game.palette,
         image: Game.image,
-        steamIDs: Game.steamIDs
+        steamIDs: Game.steamIDs,
       });
       writeFileSync(historyPath, compressed);
 

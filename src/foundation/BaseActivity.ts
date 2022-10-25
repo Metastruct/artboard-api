@@ -15,5 +15,6 @@ export default class BaseActivity {
     this.job = schedule.scheduleJob(this.rule, () => this.run());
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   public run() {}
 }

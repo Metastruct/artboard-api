@@ -1,4 +1,3 @@
-/// <reference path="Web.d.ts" />
 import axios from 'axios';
 import dayjs from 'dayjs';
 import express from 'express';
@@ -16,6 +15,11 @@ import {
   FRAME_DATE_FORMAT,
   REMOTE_ADDRESS_PREFIX,
 } from '../utilities';
+
+interface ISteamInfo {
+  nickname: string;
+  avatar: string;
+}
 
 export default class Web extends BaseEventEmitterStructure {
   private steamInfoCache: Record<string, ISteamInfo> = {};
@@ -65,7 +69,7 @@ export default class Web extends BaseEventEmitterStructure {
     );
   }
 
-  public broadcast(op: string, data: any) {
+  public broadcast(op: string, data: unknown) {
     for (const client of this.websocket.clients) {
       client.sendPayload(op, data);
     }
@@ -92,21 +96,27 @@ export default class Web extends BaseEventEmitterStructure {
 
   private isLocal(ip: string) {
     const parts = ip.split('.');
-    return parts[0] === '10' ||
-      (parts[0] === '172' && (parseInt(parts[1], 10) >= 16 && parseInt(parts[1], 10) <= 31)) ||
-      (parts[0] === '192' && parts[1] === '168');
+    return (
+      parts[0] === '10' ||
+      (parts[0] === '172' &&
+        parseInt(parts[1], 10) >= 16 &&
+        parseInt(parts[1], 10) <= 31) ||
+      (parts[0] === '192' && parts[1] === '168')
+    );
   }
 
   private handleWebSocketConnection(
     socket: WebSocket,
     request: IncomingMessage
   ) {
-    const forwarded = request.headers['x-forwarded-for'] as (string[] | string);
+    const forwarded = request.headers['x-forwarded-for'] as string[] | string;
 
     // Assuming the IP that we want is the first.
-    const ip = (Array.isArray(forwarded) ? forwarded[0] : forwarded) ||
+    const ip =
+      (Array.isArray(forwarded) ? forwarded[0] : forwarded) ||
       request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length);
-    socket.hasWriteAccess = this.writeIPs.indexOf(ip) !== -1 || this.isLocal(ip);
+    socket.hasWriteAccess =
+      this.writeIPs.indexOf(ip) !== -1 || this.isLocal(ip);
     console.log('New connection to WS:', ip);
 
     socket.sendPayload('writeAccess', socket.hasWriteAccess);
