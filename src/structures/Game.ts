@@ -253,6 +253,13 @@ export default class Game extends BaseStructure {
         embeds: [
           {
             image: { url: 'attachment://result.png' },
+            author: {
+              name: this.paletteURL.substring(
+                this.paletteURL.lastIndexOf('/') + 1
+              ),
+              url: this.paletteURL,
+            },
+            url: this.application.config.host,
           },
         ],
         attachments: [
