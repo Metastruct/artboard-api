@@ -83,17 +83,15 @@ export default class Web extends BaseEventEmitterStructure {
     if (this.steamInfoCache[id])
       return res.send(this.steamInfoCache[req.params.id]);
 
-    await axios
-      .get(`https://steamcommunity.com/profiles/${id}?xml=1`)
-      .then(async profile => {
-        let data = await parseStringPromise(profile);
-        this.steamInfoCache[id] = data = {
-          nickname: data.profile.steamID[0],
-          avatar: data.profile.avatarMedium[0],
-        };
-        return res.send(data);
-      })
-      .catch(err => console.error(err));
+    let { data } = await axios(
+      `https://steamcommunity.com/profiles/${id}?xml=1`
+    );
+    data = await parseStringPromise(data);
+    this.steamInfoCache[id] = data = {
+      nickname: data.profile.steamID[0],
+      avatar: data.profile.avatarMedium[0],
+    };
+    res.send(data);
   }
 
   private isLocal(ip: string) {
