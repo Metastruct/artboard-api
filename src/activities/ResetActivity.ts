@@ -20,9 +20,9 @@ export default class ResetActivity extends BaseActivity {
       writeFileSync(historyPath, compressed);
 
       // await Renderer.createGIF();
+      await Game.executeWebhook(true);
       await Game.createEmptyImage();
       Web.broadcast('imageReset');
-      // Game.executeWebhook();
     }
   }
 }
