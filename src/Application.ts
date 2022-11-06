@@ -42,15 +42,16 @@ export default class Application {
 
     Object.values(this.structures).forEach(v => v.onImportDone());
 
-    ['SIGINT', 'SIGTERM', 'beforeExit'].forEach(signal =>
-      process.on(signal, async () => {
-        console.log(signal + ' received! Preparing before shutdown...');
-        await Promise.all(
-          Object.values(this.structures).map(v => v.onCleanup())
-        );
-        console.log('Bye!');
-        process.exit(0);
-      })
+    ['SIGINT', 'SIGTERM', 'beforeExit', 'uncaughtExceptionMonitor'].forEach(
+      signal =>
+        process.on(signal, async () => {
+          console.log(signal + ' received! Preparing before shutdown...');
+          await Promise.all(
+            Object.values(this.structures).map(v => v.onCleanup())
+          );
+          console.log('Bye!');
+          process.exit(0);
+        })
     );
   }
 }
