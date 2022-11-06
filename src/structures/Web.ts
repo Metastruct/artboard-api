@@ -26,17 +26,22 @@ export default class Web extends BaseEventEmitterStructure {
   private readonly express: express.Application = express();
   private readonly port: number = 10010;
   private readonly server: Server = createServer(this.express);
+  private readonly steamwebAPIkey: string;
   private readonly websocket: WebSocketServer = new WebSocketServer({
     server: this.server,
   });
   private readonly writeIPs: string[];
 
   constructor(application: Application) {
-    super(application, { port: 'number?', writeIPs: 'array' });
+    super(application, {
+      port: 'number?',
+      writeIPs: 'array',
+      steamwebAPIkey: 'string',
+    });
 
     this.writeIPs = this.application.config.writeIPs;
     if (this.application.config.port) this.port = this.application.config.port;
-
+    this.steamwebAPIkey = this.application.config.steamwebAPIkey;
     this.express.use(express.static('assets/static/'));
     this.createRoutes();
 
@@ -84,15 +89,23 @@ export default class Web extends BaseEventEmitterStructure {
       return res.send(this.steamInfoCache[req.params.id]);
 
     try {
-      let { data } = await axios(
-        `https://steamcommunity.com/profiles/${id}?xml=1`
+      const resp = await axios.get(
+        `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${this.steamwebAPIkey}&steamids=${id}`
       );
-      data = await parseStringPromise(data);
-      this.steamInfoCache[id] = data = {
-        nickname: data.profile.steamID[0],
-        avatar: data.profile.avatarMedium[0],
-      };
-      res.send(data);
+
+      if (resp) {
+        let data: ISteamInfo;
+        const json = JSON.parse(resp.data);
+        if (!json.players[0]) return res.sendStatus(500);
+        const user = json.players[0];
+        this.steamInfoCache[id] = data = {
+          nickname: user.personaname,
+          avatar: user.avatarmedium,
+        };
+        res.send(data);
+      } else {
+        res.sendStatus(500);
+      }
     } catch (err) {
       console.error(err);
     }
