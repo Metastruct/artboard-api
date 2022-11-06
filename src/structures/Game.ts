@@ -29,6 +29,7 @@ export default class Game extends BaseStructure {
   private readonly banned?: Record<string, boolean>;
   private readonly timeoutTime?: number;
   private readonly webhookURL: string;
+  private readonly webhookArchiveURL: string;
   private readonly msgID: string;
 
   constructor(application: Application) {
@@ -38,14 +39,22 @@ export default class Game extends BaseStructure {
       host: 'string?',
       timeoutTime: 'number',
       webhookURL: 'string?',
+      webhookArchiveURL: 'string?',
     });
 
-    const { banned, dimensions, timeoutTime, webhookURL, msgID } =
-      this.application.config;
+    const {
+      banned,
+      dimensions,
+      timeoutTime,
+      webhookURL,
+      webhookArchiveURL,
+      msgID,
+    } = this.application.config;
     this.banned = banned || {};
     this.dimensions = dimensions;
     this.timeoutTime = timeoutTime;
     this.webhookURL = webhookURL;
+    this.webhookArchiveURL = webhookArchiveURL;
     this.msgID = msgID;
 
     this.loadImage();
@@ -240,50 +249,112 @@ export default class Game extends BaseStructure {
     await promises.writeFile(SAVE_FILENAME, json);
   }
 
-  public executeWebhook() {
-    if (!this.webhookURL || !this.application.config.host || !this.msgID)
+  public executeWebhook(toArchive = false) {
+    if (
+      !this.webhookURL ||
+      !this.webhookArchiveURL ||
+      !this.application.config.host ||
+      !this.msgID
+    )
       return false;
 
-    const formData = new FormData();
-    formData.append(
-      'payload_json',
-      JSON.stringify({
-        username: 'Artboard',
-        avatar_url: this.application.config.host + '/icon.png',
-        content: `[click here to view it on the website.](${this.application.config.host})`,
-        embeds: [
-          {
-            image: { url: 'attachment://result.png' },
-            author: {
-              name: `Current Palette: ${this.paletteURL.substring(
-                this.paletteURL.lastIndexOf('/') + 1
-              )}`,
-              url: this.paletteURL,
-              icon_url: 'https://lospec.com/brand/lospec_logomark_3x.png',
+    if (toArchive) {
+      const uniqueIDs = [...new Set(this.steamIDs)];
+      const uniquePixels = [...new Set(this.image.map(color => color !== -1))];
+      const formData = new FormData();
+      formData.append(
+        'payload_json',
+        JSON.stringify({
+          username: 'Artboard',
+          avatar_url: this.application.config.host + '/icon.png',
+          embeds: [
+            {
+              image: { url: 'attachment://result.png' },
+              fields: [
+                {
+                  name: 'Palette:',
+                  value: this.paletteURL.substring(
+                    this.paletteURL.lastIndexOf('/') + 1
+                  ),
+                  inline: true,
+                },
+                {
+                  name: 'Total Pixels Placed:',
+                  value: uniquePixels.length,
+                  inline: true,
+                },
+                {
+                  name: 'Total Participants:',
+                  value: uniqueIDs.length,
+                  inline: true,
+                },
+              ],
             },
-          },
-        ],
-        attachments: [
-          {
-            id: 0,
-            filename: 'result.png',
-          },
-        ],
-      }),
-      { contentType: 'application/json' }
-    );
-    formData.append(
-      'files[0]',
-      this.application.structures.Renderer.renderFrame(),
-      { filename: 'result.png' }
-    );
+          ],
+          attachments: [
+            {
+              id: 0,
+              filename: 'result.png',
+            },
+          ],
+        }),
+        { contentType: 'application/json' }
+      );
+      formData.append(
+        'files[0]',
+        this.application.structures.Renderer.renderFrame(),
+        { filename: 'result.png' }
+      );
 
-    const formHeaders = formData.getHeaders();
+      const formHeaders = formData.getHeaders();
 
-    axios
-      .patch(`${this.webhookURL}/messages/${this.msgID}`, formData, {
-        headers: { ...formHeaders },
-      })
-      .catch(err => console.error(err));
+      axios
+        .post(`${this.webhookArchiveURL}`, formData, {
+          headers: { ...formHeaders },
+        })
+        .catch(err => console.error(err));
+    } else {
+      const formData = new FormData();
+      formData.append(
+        'payload_json',
+        JSON.stringify({
+          username: 'Artboard',
+          avatar_url: this.application.config.host + '/icon.png',
+          content: `[click here to view it on the website.](${this.application.config.host})`,
+          embeds: [
+            {
+              image: { url: 'attachment://current.png' },
+              author: {
+                name: `Current Palette: ${this.paletteURL.substring(
+                  this.paletteURL.lastIndexOf('/') + 1
+                )}`,
+                url: this.paletteURL,
+                icon_url: 'https://lospec.com/brand/lospec_logomark_3x.png',
+              },
+            },
+          ],
+          attachments: [
+            {
+              id: 0,
+              filename: 'current.png',
+            },
+          ],
+        }),
+        { contentType: 'application/json' }
+      );
+      formData.append(
+        'files[0]',
+        this.application.structures.Renderer.renderFrame(),
+        { filename: 'current.png' }
+      );
+
+      const formHeaders = formData.getHeaders();
+
+      axios
+        .patch(`${this.webhookURL}/messages/${this.msgID}`, formData, {
+          headers: { ...formHeaders },
+        })
+        .catch(err => console.error(err));
+    }
   }
 }
