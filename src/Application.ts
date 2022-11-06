@@ -14,6 +14,7 @@ interface IConfig {
   pixelRenderSize: number;
 
   port?: number;
+  steamwebAPIkey: string;
   writeIPs: string[];
 }
 
