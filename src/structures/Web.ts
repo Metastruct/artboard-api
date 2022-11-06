@@ -4,7 +4,6 @@ import express from 'express';
 import { createServer, IncomingMessage, Server } from 'http';
 import { resolve } from 'path';
 import { Data } from 'ws';
-import { parseStringPromise } from 'xml2js';
 
 import Application from '../Application';
 import { BaseEventEmitterStructure } from '../foundation/BaseStructure';
@@ -95,8 +94,8 @@ export default class Web extends BaseEventEmitterStructure {
 
       if (resp) {
         let data: ISteamInfo;
-        const json = resp.data;
-        if (!json.players[0]) return res.sendStatus(500);
+        const json = resp.data.response;
+        if (json.players.length === 0) return res.sendStatus(500);
         const user = json.players[0];
         this.steamInfoCache[id] = data = {
           nickname: user.personaname,
