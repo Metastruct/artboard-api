@@ -95,7 +95,7 @@ export default class Web extends BaseEventEmitterStructure {
 
       if (resp) {
         let data: ISteamInfo;
-        const json = JSON.parse(resp.data);
+        const json = resp.data;
         if (!json.players[0]) return res.sendStatus(500);
         const user = json.players[0];
         this.steamInfoCache[id] = data = {
