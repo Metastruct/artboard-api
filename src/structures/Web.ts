@@ -41,6 +41,7 @@ export default class Web extends BaseEventEmitterStructure {
     this.writeIPs = this.application.config.writeIPs;
     if (this.application.config.port) this.port = this.application.config.port;
     this.steamwebAPIkey = this.application.config.steamwebAPIkey;
+    this.express.set('trust proxy', 1);
     this.express.use(express.static('assets/static/'));
     this.createRoutes();
 
