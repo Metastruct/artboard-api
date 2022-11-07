@@ -24,6 +24,7 @@
     "colorsys": "^1.0.22",
     "dayjs": "^1.10.5",
     "express": "^4.17.1",
+    "express-rate-limit": "^6.6.0",
     "form-data": "^4.0.0",
     "gm": "^1.23.1",
     "node-schedule": "^2.0.0",
