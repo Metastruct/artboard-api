@@ -1,6 +1,7 @@
 import axios from 'axios';
 import dayjs from 'dayjs';
 import express from 'express';
+import ratelimit from 'express-rate-limit';
 import { createServer, IncomingMessage, Server } from 'http';
 import { resolve } from 'path';
 import { Data } from 'ws';
@@ -11,7 +12,6 @@ import {
   WEBSOCKET_UNSUPPORTED_PAYLOAD,
   WebSocketServer,
   WebSocket,
-  FRAME_DATE_FORMAT,
   REMOTE_ADDRESS_PREFIX,
 } from '../utilities';
 
@@ -56,14 +56,16 @@ export default class Web extends BaseEventEmitterStructure {
     this.express.get('/get/:id', (req, res) =>
       this.handleSteamRequest(req, res)
     );
-    this.express.get('/latest', (_req, res) =>
-      res.sendFile(
-        resolve(
-          __dirname,
-          '../../assets/frames/',
-          `frame_${dayjs().format(FRAME_DATE_FORMAT)}.png`
-        )
-      )
+    this.express.get(
+      '/latest',
+      ratelimit({
+        windowMs: 5 * 60 * 1000,
+        max: 10,
+      }),
+      (_req, res) => {
+        res.setHeader('Content-Type', 'image/png');
+        this.application.structures.Renderer.renderFrame().pipe(res);
+      }
     );
   }
 
