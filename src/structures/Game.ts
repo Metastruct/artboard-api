@@ -335,9 +335,9 @@ export default class Game extends BaseStructure {
                 },
                 {
                   name: 'Next Reset:',
-                  value: `<t:${parseExpression('* * 1,15 * *')
-                    .next()
-                    .getSeconds()}:R`,
+                  value: `<t:${Math.round(
+                    parseExpression('* * 1,15 * *').next().getTime()
+                  )}:R`,
                   inline: true,
                 },
               ],
