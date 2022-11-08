@@ -22,6 +22,7 @@
     "axios": "^0.21.1",
     "canvas": "^2.8.0",
     "colorsys": "^1.0.22",
+    "cron-parser": "^4.6.0",
     "dayjs": "^1.10.5",
     "express": "^4.17.1",
     "express-rate-limit": "^6.6.0",

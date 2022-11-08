@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { hex2Rgb } from 'colorsys';
+import { parseExpression } from 'cron-parser';
 import FormData from 'form-data';
 import { promises } from 'fs';
 
@@ -324,13 +325,23 @@ export default class Game extends BaseStructure {
           embeds: [
             {
               image: { url: 'attachment://current.png' },
-              author: {
-                name: `Current Palette: ${this.paletteURL.substring(
-                  this.paletteURL.lastIndexOf('/') + 1
-                )}`,
-                url: this.paletteURL,
-                icon_url: 'https://lospec.com/brand/lospec_logomark_3x.png',
-              },
+              fields: [
+                {
+                  name: 'Palette:',
+                  value: this.paletteURL.substring(
+                    this.paletteURL.lastIndexOf('/') + 1
+                  ),
+                  inline: true,
+                },
+                {
+                  name: 'Next Reset:',
+                  value: `<t:${Math.floor(
+                    parseExpression('* * 1,15 * *').next().getMilliseconds() /
+                      1000
+                  )}:R`,
+                  inline: true,
+                },
+              ],
             },
           ],
           attachments: [
