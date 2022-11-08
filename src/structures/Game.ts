@@ -328,16 +328,16 @@ export default class Game extends BaseStructure {
               fields: [
                 {
                   name: 'Palette:',
-                  value: this.paletteURL.substring(
+                  value: `[${this.paletteURL.substring(
                     this.paletteURL.lastIndexOf('/') + 1
-                  ),
+                  )}](${this.paletteURL})`,
                   inline: true,
                 },
                 {
                   name: 'Next Reset:',
                   value: `<t:${Math.round(
                     parseExpression('* * 1,15 * *').next().getTime()
-                  )}:R`,
+                  )}:R>`,
                   inline: true,
                 },
               ],
