@@ -274,9 +274,9 @@ export default class Game extends BaseStructure {
               fields: [
                 {
                   name: 'Palette:',
-                  value: this.paletteURL.substring(
+                  value: `[${this.paletteURL.substring(
                     this.paletteURL.lastIndexOf('/') + 1
-                  ),
+                  )}](${this.paletteURL})`,
                   inline: true,
                 },
                 {
