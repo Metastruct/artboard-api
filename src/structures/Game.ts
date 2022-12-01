@@ -260,7 +260,7 @@ export default class Game extends BaseStructure {
       return false;
 
     if (toArchive) {
-      const uniqueIDs = [...new Set(this.steamIDs)];
+      const uniqueIDs = [...new Set(this.steamIDs.filter(id => id !== null))];
       const uniquePixels = this.image.filter(color => color !== -1);
       const formData = new FormData();
       formData.append(
