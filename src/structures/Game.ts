@@ -263,6 +263,7 @@ export default class Game extends BaseStructure {
       const uniqueIDs = [...new Set(this.steamIDs.filter(id => id !== null))];
       const uniquePixels = this.image.filter(color => color !== -1);
       const formData = new FormData();
+      const size = this.dimensions[0] * this.dimensions[1];
       formData.append(
         'payload_json',
         JSON.stringify({
@@ -280,8 +281,10 @@ export default class Game extends BaseStructure {
                   inline: true,
                 },
                 {
-                  name: 'Total Pixels Placed:',
-                  value: uniquePixels.length,
+                  name: 'Coverage:',
+                  value: `${((uniquePixels.length / size) * 100).toFixed(
+                    2
+                  )}% (${uniquePixels.length} pixels)`,
                   inline: true,
                 },
                 {
