@@ -259,11 +259,12 @@ export default class Game extends BaseStructure {
     )
       return false;
 
+    const uniqueIDs = [...new Set(this.steamIDs.filter(id => id !== null))];
+    const uniquePixels = this.image.filter(color => color !== -1);
+    const size = this.dimensions[0] * this.dimensions[1];
+
     if (toArchive) {
-      const uniqueIDs = [...new Set(this.steamIDs.filter(id => id !== null))];
-      const uniquePixels = this.image.filter(color => color !== -1);
       const formData = new FormData();
-      const size = this.dimensions[0] * this.dimensions[1];
       formData.append(
         'payload_json',
         JSON.stringify({
@@ -334,6 +335,13 @@ export default class Game extends BaseStructure {
                   value: `[${this.paletteURL.substring(
                     this.paletteURL.lastIndexOf('/') + 1
                   )}](${this.paletteURL})`,
+                  inline: true,
+                },
+                {
+                  name: 'Coverage:',
+                  value: `${((uniquePixels.length / size) * 100).toFixed(
+                    2
+                  )}% (${uniquePixels.length} pixels)`,
                   inline: true,
                 },
                 {
