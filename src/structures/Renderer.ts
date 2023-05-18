@@ -1,7 +1,7 @@
 import { Canvas, CanvasRenderingContext2D } from 'canvas';
 import dayjs from 'dayjs';
 import { createWriteStream, readdirSync, unlinkSync } from 'fs';
-import gm from 'gm';
+// import gm from 'gm';
 
 import Application from '../Application';
 import { BaseStructure } from '../foundation/BaseStructure';
@@ -55,22 +55,22 @@ export default class Renderer extends BaseStructure {
     return stream;
   }
 
-  public async createGIF() {
-    const { width, height } = this.canvas;
-    const gif = gm('assets/frames/frame_*.png');
-    gif
-      .delay(10)
-      .dispose('previous')
-      .resize(width / 2, height / 2);
+  // public async createGIF() {
+  //   const { width, height } = this.canvas;
+  //   const gif = gm('assets/frames/frame_*.png');
+  //   gif
+  //     .delay(10)
+  //     .dispose('previous')
+  //     .resize(width / 2, height / 2);
 
-    await new Promise((res, rej) => {
-      gif.write('assets/static/result.gif', err => {
-        if (err) rej(err);
-        res(true);
-      });
-    });
+  //   await new Promise((res, rej) => {
+  //     gif.write('assets/static/result.gif', err => {
+  //       if (err) rej(err);
+  //       res(true);
+  //     });
+  //   });
 
-    for (const file of readdirSync('assets/frames/'))
-      unlinkSync(`assets/frames/${file}`);
-  }
+  //   for (const file of readdirSync('assets/frames/'))
+  //     unlinkSync(`assets/frames/${file}`);
+  // }
 }
