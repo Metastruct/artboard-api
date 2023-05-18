@@ -259,7 +259,7 @@ export default class Game extends BaseStructure {
     )
       return false;
 
-    const uniqueIDs = [...new Set(this.steamIDs.filter(id => id !== null))];
+    const uniqueIDs = new Set(this.steamIDs.filter(id => id !== null));
     const uniquePixels = this.image.filter(color => color !== -1);
     const size = this.dimensions[0] * this.dimensions[1];
 
@@ -290,7 +290,7 @@ export default class Game extends BaseStructure {
                 },
                 {
                   name: 'Total Participants:',
-                  value: uniqueIDs.length,
+                  value: uniqueIDs.size,
                   inline: true,
                 },
               ],
