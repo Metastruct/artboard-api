@@ -1,7 +1,6 @@
 FROM node:15
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y graphicsmagick && apt install -y graphicsmagick-imagemagick-compat
 
 WORKDIR /usr/src/app
 
