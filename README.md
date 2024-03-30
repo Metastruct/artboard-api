@@ -145,16 +145,17 @@ ID (in 64-bit format) is specified in `data`.
 
 #### `imageUpdate`
 This OP code is sent only from the server whenever the image is changed.
-The payload data contains the image and its difference between how it was updated
-before and after.
+The payload data contains its difference between how it was updated
+before and after, as well as the Steam ID of the player (in 64-bit format)
+who made the change.
 
 ##### Example payload
 ```json
 {
   "op": "imageUpdate",
   "data": {
-    "image": [...],
-    "diff": {...}
+    "diff": {...},
+    "steamId": "76561198086180059"
   }
 }
 ```

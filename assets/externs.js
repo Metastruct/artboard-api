@@ -50,7 +50,7 @@ SteamResponse.prototype.avatar;
 
 /** @interface */
 function ImageUpdate() {}
-/** @type {Array} */
-ImageUpdate.prototype.image;
 /** @type {Object} */
 ImageUpdate.prototype.diff;
+/** @type {string} */
+ImageUpdate.prototype.steamId;

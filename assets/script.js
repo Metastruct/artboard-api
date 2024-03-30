@@ -205,8 +205,13 @@ class Artboard {
       } break;
 
       case 'imageUpdate': {
-        const { image } = /** @type {ImageUpdate} */ data;
-        this.data.image = image;
+        const { diff, steamId } = /** @type {ImageUpdate} */ data;
+        for (const position in diff) {
+          const color = diff[position] - 1;
+          const xy = parseInt(position);
+          this.data.steamIDs[xy] = steamId;
+          this.data.image[xy] = color;
+        }
       } break;
     }
 
