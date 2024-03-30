@@ -371,7 +371,8 @@ class Artboard {
       this.nickname.innerHTML = res.nickname;
       this.nickname.href = `https://steamcommunity.com/profiles/${steamId}`;
 
-      this.avatar.style.outlineColor = 'rgb(' + this.data.palette[xy].join(',') + ')';
+      const color = this.data.image[xy];
+      this.avatar.style.outlineColor = 'rgb(' + this.data.palette[color].join(',') + ')';
       this.avatar.src = res.avatar;
     } else if (!this.lock)
       this.info.classList.add('hidden');
