@@ -54,8 +54,8 @@ export interface WebSocketAPIEvents {
   };
   [WEBSOCKET_EVENTS.IMAGE_RESET]: true;
   [WEBSOCKET_EVENTS.IMAGE_UPDATE]: {
-    image: number[];
     diff: Record<number, number>;
+    steamId: string;
   };
   [WEBSOCKET_EVENTS.WRITE_ACCESS]: boolean;
 }

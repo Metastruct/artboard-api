@@ -97,8 +97,8 @@ export default class Game extends BaseStructure {
     this.timeouts[steamID] = Date.now();
 
     this.structures.Web.broadcast(WEBSOCKET_EVENTS.IMAGE_UPDATE, {
-      image: this.data.image,
       diff: pixels,
+      steamId: steamID
     });
 
     this.structures.Web.broadcast(WEBSOCKET_EVENTS.EXECUTE_TIMEOUT, steamID);
