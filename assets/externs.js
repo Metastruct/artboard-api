@@ -1,20 +1,36 @@
 /** @interface */
-function WSMessage() {}
+function WSParsedMessage() {}
 /** @type {string} */
-WSMessage.prototype.op;
+WSParsedMessage.prototype.op;
 /** @type {*} */
-WSMessage.prototype.data;
+WSParsedMessage.prototype.data;
+
+/** @interface */
+function WSMessageEvent() {}
+/** @type {string} */
+WSMessageEvent.prototype.data;
+
+/** @interface */
+function ImageInfoData() {}
+/** @type {Array} */
+ImageInfoData.prototype.image;
+/** @type {Array<Array>} */
+ImageInfoData.prototype.palette;
+/** @type {string} */
+ImageInfoData.prototype.paletteURL;
+/** @type {Array} */
+ImageInfoData.prototype.steamIDs;
 
 /** @interface */
 function ImageInfo() {}
-/** @type {Array<Array>} */
-ImageInfo.prototype.palette;
-/** @type {Array} */
-ImageInfo.prototype.image;
-/** @type {Array} */
-ImageInfo.prototype.steamIDs;
+/** @type {Object} */
+ImageInfo.prototype.banned;
+/** @type {ImageInfoData} */
+ImageInfo.prototype.data;
 /** @type {Array} */
 ImageInfo.prototype.dimensions;
+/** @type {number} */
+ImageInfo.prototype.timeoutTime;
 
 /** @interface */
 function AddPixel() {}
@@ -31,3 +47,10 @@ function SteamResponse() {}
 SteamResponse.prototype.nickname;
 /** @type {string} */
 SteamResponse.prototype.avatar;
+
+/** @interface */
+function ImageUpdate() {}
+/** @type {Array} */
+ImageUpdate.prototype.image;
+/** @type {Object} */
+ImageUpdate.prototype.diff;

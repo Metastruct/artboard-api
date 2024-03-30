@@ -4,288 +4,389 @@
 
 /* eslint no-undef: 0 */
 
+const FRICTION = 0.25;
+const MIN_ZOOM = 0.2;
+const MAX_ZOOM = 64;
+const ZOOM_PER_WHEEL = 0.25;
+const WALL_OPACITY = 0.6;
+
 class Artboard {
   constructor() {
-    this.errorElem      = document.querySelector('.error');
-    this.infoElem       = document.querySelector('.info');
-    this.avatarElem     = document.querySelector('.avatar');
-    this.nicknameElem   = document.querySelector('.nickname');
-    this.canvasElem     = document.querySelector('#canvas');
+    this.statusText = document.querySelector('.status-text');
+    this.info = document.querySelector('.info');
+    this.avatar = this.info.querySelector('.avatar');
+    this.nickname = this.info.querySelector('.nickname');
+    this.canvas = document.querySelector('#canvas');
     this.externalCanvas = document.querySelector('#external');
 
-    this.canvasCtx      = this.canvasElem.getContext('2d');
-    this.externalCtx    = this.externalCanvas.getContext('2d');
+    this.context = this.canvas.getContext('2d');
+    this.external = this.externalCanvas.getContext('2d');
 
-    this.imageWidth     = 640;
-    this.imageHeight    = 160;
+    this.dimensions = [ 640, 160 ];
+    this.size = 3;
+    this.offset = [0, 0];
+    this.velocity = [0, 0];
+    this.speed = [0, 0];
+    this.cache = {};
+    this.drag = false;
+    this.click = false;
+    /** @type {ImageInfoData|boolean} */
+    this.data = false;
+    this.oldMouse = [ 0, 0 ];
+    this.mouse = [ 0, 0 ];
+    this.lock = false;
+    this.wall = new Image;
+    this.wall.src = '/images/wall.png';
+    this.time = 0;
 
-    this.size           = 3;
-    this.offsetCoords   = [0, 0];
-    this.velocity       = [0, 0];
-    this.speed          = [0, 0];
-    this.friction       = 0.25;
+    this.onResize = this.onResize.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onWheel = this.onWheel.bind(this);
+    this.renderCanvas = this.renderCanvas.bind(this);
+    this.processReceivedMessage = this.processReceivedMessage.bind(this);
 
-    this.cache          = {};
+    window.addEventListener('resize', this.onResize);
+    document.addEventListener('mouseup', this.onMouseUp);
+    this.canvas.addEventListener('mousedown', this.onMouseDown);
+    this.canvas.addEventListener('mousemove', this.onMouseMove);
+    this.canvas.addEventListener('wheel', this.onWheel);
+
+    window.requestAnimationFrame(this.renderCanvas);
 
     this.onResize();
     this.openConnection();
-    this.setupWindowEvents();
   }
 
-  setupWindowEvents() {
-    window.addEventListener('resize', () => this.onResize());
-    window.addEventListener(
-      'mouseup',
-      () => (this.isDragging = false)
-    );
-    window.addEventListener('mousedown', (e) => {
-      const relatedToInfoElem = e.target === this.infoElem ||
-        e.target.parentNode === this.infoElem;
-      if (relatedToInfoElem) return;
+  onMouseUp() {
+    if (!this.drag)
+      this.updateInformationElement(true);
 
-      this.velocity = [0, 0];
-      this.isDragging = true;
-      this.oldMouseCoords = [e.clientX, e.clientY];
-    });
-    window.addEventListener('mousemove', (e) => {
-      const relatedToInfoElem = e.target === this.infoElem ||
-        e.target.parentNode === this.infoElem;
-      if (!this.isDragging && relatedToInfoElem) return;
-
-      this.mouseCoords = [e.clientX, e.clientY];
-    });
-    window.addEventListener('wheel', ({ x, y, deltaY }) => {
-      const { width, height } = this.canvasElem;
-
-      const direction = deltaY > 0 ? -1 : 1;
-      const size = direction * 0.25 * this.size;
-      if (this.size + size <= 0.2 || this.size + size >= 64) return;
-
-      const wx = (x - this.offsetCoords[0]) / (width * this.size);
-      const wy = (y - this.offsetCoords[1]) / (height * this.size);
-
-      this.offsetCoords[0] -= wx * width * size;
-      this.offsetCoords[1] -= wy * height * size;
-      this.size += size;
-    });
-
-    window.requestAnimationFrame(() => this.renderCanvas());
+    this.click = false;
+    this.drag = false;
   }
 
-  getSteamNameAvatar(sid) {
-    if (this.cache[sid]) return this.cache[sid];
-    this.cache[sid] = { avatar: '', nickname: 'Loading...' };
+  onMouseDown(event) {
+    this.oldMouse[0] = event.clientX;
+    this.oldMouse[1] = event.clientY;
+    this.velocity[0] = 0;
+    this.velocity[1] = 0;
+    this.click = true;
+  }
 
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', `https://${document.location.host}/get/${sid}`);
-    xhr.send();
-    xhr.onload = () => {
-      if (xhr.readyState === xhr.DONE && xhr.status === 200)
-        this.cache[sid] = JSON.parse(xhr.responseText);
-    };
+  onMouseMove(event) {
+    if (this.click)
+      this.drag = true;
 
-    return this.cache[sid];
+    this.mouse[0] = event.clientX;
+    this.mouse[1] = event.clientY;
+    this.updateInformationElement();
+  }
+
+  onWheel(event) {
+    const { width, height } = this.canvas;
+
+    const direction = Math.sign(-event.deltaY);
+    const size = direction * ZOOM_PER_WHEEL * this.size;
+    if (this.size + size <= MIN_ZOOM || this.size + size >= MAX_ZOOM) return;
+
+    const wx = (event.x - this.offset[0]) / (width * this.size);
+    const wy = (event.y - this.offset[1]) / (height * this.size);
+
+    this.offset[0] -= wx * width * size;
+    this.offset[1] -= wy * height * size;
+    this.size += size;
+    this.updateInformationElement();
   }
 
   onResize() {
-    const width = this.canvasElem.clientWidth;
-    const height = this.canvasElem.clientHeight;
+    const width = this.canvas.clientWidth;
+    const height = this.canvas.clientHeight;
 
-    if (this.canvasElem.width !== width || this.canvasElem.height !== height) {
-      this.canvasElem.width = width;
-      this.canvasElem.height = height;
+    if (this.canvas.width !== width || this.canvas.height !== height) {
+      this.canvas.width = width;
+      this.canvas.height = height;
     }
+
     this.renderImage();
   }
 
   openConnection(i = 0) {
     /** @suppress {checkTypes} */
-    this.ws = new WebSocket(`wss://${document.location.host}/`);
+    this.ws = new WebSocket(document.location.origin.replace('http', 'ws'));
+    this.status('Connecting...', true);
 
     this.ws.addEventListener('error', (e) => {
-      this.error(true, 'Error occurred!');
+      this.status('WebSocket spew out an error, check DevTools console.');
       console.error(e);
     });
 
     this.ws.addEventListener('close', () => {
-      this.error(true, 'WebSocket connection has closed.');
-      if (i <= 3) this.openConnection(i + 1);
+      if (i <= 3)
+        this.openConnection(i + 1)
+      else
+        this.status('Unable to reconnect. You may need to refresh the page.');
     });
 
     this.ws.addEventListener('open', () => {
-      this.error(false);
+      this.status();
       i = 0;
     });
 
-    this.ws.addEventListener('message', ({ data }) =>
-      this.processReceivedMessage(data)
-    );
+    /** @suppress {checkTypes} */
+    this.ws.addEventListener('message', this.processReceivedMessage);
   }
 
-  error(show, errorMsg = '') {
-    show = show
-      ? this.errorElem.classList.remove('hidden')
-      : this.errorElem.classList.add('hidden');
-    this.errorElem.innerHTML = errorMsg;
+  status(msg = undefined, load = false) {
+    switch (true) {
+      case msg !== undefined:
+        this.statusText.innerHTML = msg;
+        break;
+      case this.data !== undefined:
+        console.log(this.data);
+        this.statusText.innerHTML = `Current palette: <a href="${this.data.paletteURL}">${this.data.paletteURL}</a>`;
+        break;
+      default:
+        this.statusText.innerHTML = 'Nothing is working!!';
+    }
+
+    if (load)
+      this.statusText.innerHTML = '<div class="loader"></div>' + this.statusText.innerHTML;
   }
 
   /**
-   * nightmare nightmare nightmare
    * @suppress {misplacedTypeAnnotation}
+   * @param {WSMessageEvent} event
    */
-  processReceivedMessage(received) {
-    const msg = /** @type {WSMessage} */ JSON.parse(received);
+  async processReceivedMessage(event) {
+    const msg = /** @type {WSParsedMessage} */ JSON.parse(event.data);
     const { op, data } = msg;
 
     switch (op) {
-      case 'imageData':
-        const { palette, image, steamIDs, dimensions } = /** @type {ImageInfo} */ data;
-        this.palette = palette;
-        this.image = image;
-        this.steamIDs = steamIDs;
-        this.imageWidth = dimensions[0];
-        this.imageHeight = dimensions[1];
-        break;
-      case 'addPixel':
+      case 'imageData': {
+        const { data: imageData, dimensions } = /** @type {ImageInfo} */ data;
+        this.data = imageData;
+
+        this.dimensions = dimensions;
+        this.status();
+
+        if (!window.location.hash) break;
+
+        const values = window.location.hash
+          .slice(1)
+          .split(';')
+          .map(x => +x)
+          .filter((v, k) => !isNaN(v) && isFinite(v) && v >= 0 && v < this.dimensions[k]);
+
+        if (values.length < 2) break;
+
+        const hashJump = values.map(Math.floor);
+
+        const xy = hashJump[1] * this.dimensions[0] + hashJump[0];
+        const steamId = this.data.steamIDs[xy];
+        if (steamId) {
+          await this.getSteamProfileInfo(steamId, false);
+
+          this.size = MAX_ZOOM / 2;
+          this.offset = [
+            window.innerWidth / 2 - (hashJump[0] + 0.5) * this.size,
+            window.innerHeight / 2 - (hashJump[1] + 0.5) * this.size
+          ];
+
+          this.updateInformationElement(hashJump);
+        }
+      } break;
+
+      case 'addPixel': {
         const { xy, color, steamId } = /** @type {AddPixel} */ data;
-        this.image[xy] = color;
-        this.steamIDs[xy] = steamId;
-        console.log(steamId, 'placed a pixel at', xy);
+        this.data.image[xy] = color;
+        this.data.steamIDs[xy] = steamId;
+      } break;
+
+      case 'imageUpdate': {
+        const { image } = /** @type {ImageUpdate} */ data;
+        this.data.image = image;
+      } break;
     }
 
     this.renderImage();
   }
 
-  renderCanvas() {
-    if (this.imageBlob) {
-      this.update();
-      this.canvasCtx.save();
+  renderCanvas(time) {
+    const deltaTime = this.time ? time - this.time : 0;
+    this.time = time;
 
-      const { width, height } = this.canvasElem;
-      this.canvasCtx.clearRect(0, 0, width, height);
-      this.canvasCtx.imageSmoothingEnabled = false;
+    this.update(deltaTime);
 
-      this.canvasCtx.translate(this.offsetCoords[0], this.offsetCoords[1]);
-      this.canvasCtx.scale(this.size, this.size);
+    const { width, height } = this.canvas;
+    this.context.clearRect(0, 0, width, height);
+    this.context.save();
 
-      this.canvasCtx.drawImage(
-        this.imageBlob,
-        0,
-        0,
-        this.imageWidth,
-        this.imageHeight
-      );
+    this.context.imageSmoothingEnabled = false;
 
-      this.canvasCtx.restore();
+    this.context.translate(this.offset[0], this.offset[1]);
+    this.context.scale(this.size, this.size);
+
+    this.context.globalAlpha = WALL_OPACITY;
+
+    if (this.wall.complete) {
+      for (let x = 0; x < this.dimensions[0]; x += this.dimensions[1]) {
+        const wallWidth = this.dimensions[1] - Math.max(0, x + this.dimensions[1] - this.dimensions[0]);
+
+        this.context.drawImage(
+          this.wall,
+          0,
+          0,
+          this.wall.width * wallWidth / this.dimensions[1],
+          this.wall.height,
+          x,
+          0,
+          wallWidth,
+          this.dimensions[1]
+        );
+      }
     }
 
-    window.requestAnimationFrame(() => this.renderCanvas());
+    this.context.globalAlpha = 1;
+
+    this.context.drawImage(
+      this.externalCanvas,
+      0,
+      0,
+      this.dimensions[0],
+      this.dimensions[1]
+    );
+
+    this.context.restore();
+
+    window.requestAnimationFrame(this.renderCanvas);
   }
 
-  update() {
-    this.updateVelocity();
-    this.updateInformationElement();
-  }
+  update(deltaTime) {
+    if (this.drag || this.click) {
+      if (this.mouse[0] !== this.oldMouse[0] && this.mouse[1] !== this.oldMouse[1]) {
+        const [cx, cy] = this.mouse;
+        const dx = cx - this.oldMouse[0],
+          dy = cy - this.oldMouse[1];
 
-  updateVelocity() {
-    if (this.isDragging) {
-      if (this.mouseCoords !== this.oldMouseCoords) {
-        const [cx, cy] = this.mouseCoords;
-        const dx = cx - this.oldMouseCoords[0],
-          dy = cy - this.oldMouseCoords[1];
+        this.offset[0] += dx;
+        this.offset[1] += dy;
+        this.speed = [ dx, dy ];
 
-        this.offsetCoords[0] += dx;
-        this.offsetCoords[1] += dy;
-
-        const [x1, y1] = this.oldMouseCoords;
-        const [x2, y2] = this.mouseCoords;
-        this.speed = [x2 - x1, y2 - y1];
-
-        this.oldMouseCoords = [cx, cy];
+        this.oldMouse = [ cx, cy ];
       } else
-        this.speed = [0, 0];
+        this.speed = [ 0, 0 ];
 
       return;
     }
 
-    this.velocity[0] += this.speed[0];
-    this.velocity[1] += this.speed[1];
+    this.velocity[0] += this.speed[0] * (60 / 1000) * deltaTime;
+    this.velocity[1] += this.speed[1] * (60 / 1000) * deltaTime;
 
     let speed = Math.hypot(this.velocity[0], this.velocity[1]);
     const angle = Math.atan2(this.velocity[1], this.velocity[0]);
 
-    if (speed > this.friction)
-      speed -= this.friction
+    if (speed > FRICTION)
+      speed -= FRICTION * (60 / 1000) * deltaTime
     else
       speed = 0;
 
-    this.velocity[0] = Math.cos(angle) * speed;
-    this.velocity[1] = Math.sin(angle) * speed;
+    this.velocity = [
+      Math.cos(angle) * speed,
+      Math.sin(angle) * speed
+    ];
 
-    this.offsetCoords[0] += this.velocity[0];
-    this.offsetCoords[1] += this.velocity[1];
+    this.offset[0] += this.velocity[0] * (60 / 1000) * deltaTime;
+    this.offset[1] += this.velocity[1] * (60 / 1000) * deltaTime;
+
+    if (this.lock && (this.velocity[0] !== 0 || this.velocity[1] !== 0))
+      this.updateInformationElement();
 
     this.speed = [0, 0];
   }
 
-  updateInformationElement() {
-    const {
-      infoElem,
-      mouseCoords,
-      offsetCoords,
-      nicknameElem,
-      avatarElem,
-    } = this;
+  getSteamProfileInfo(sid, lazy = true) {
+    if (this.cache[sid]) return this.cache[sid];
 
-    if (!mouseCoords) return;
+    const promise = fetch('/get/' + sid)
+      .then(res => res.json())
+      .then(json => {
+        this.cache[sid] = json;
+        this.updateInformationElement();
+      })
+      .catch(() => delete this.cache[sid]);
 
-    const elem = document.elementFromPoint(mouseCoords[0], mouseCoords[1]);
-    if (!this.isDragging && elem === infoElem && infoElem.className.indexOf('hidden') < 0)
+    if (!lazy)
+      return promise;
+
+    return this.cache[sid] = { avatar: '', nickname: 'Loading...' };
+  }
+
+  /**
+   * @suppress {misplacedTypeAnnotation}
+   */
+  updateInformationElement(keep = false) {
+    if (!this.data || !this.data.steamIDs) return;
+
+    let mouse = [
+      Math.floor((this.mouse[0] - this.offset[0]) / this.size),
+      Math.floor((this.mouse[1] - this.offset[1]) / this.size)
+    ];
+
+    if (this.lock)
+      mouse = this.lock
+    else if (Array.isArray(keep))
+      mouse = keep;
+
+    this.info.style.left = this.offset[0] + (mouse[0] + 0.5) * this.size + 'px';
+    this.info.style.top = this.offset[1] + mouse[1] * this.size + 'px';
+
+    const xy = mouse[1] * this.dimensions[0] + mouse[0];
+    const steamId = this.data.steamIDs[xy];
+
+    if (keep) {
+      if (steamId && this.lock === false) {
+        this.lock = mouse;
+        this.info.classList.add('locked');
+        window.location.hash = this.lock.join(';');
+      } else {
+        this.lock = false;
+        this.info.classList.remove('locked');
+        window.location.hash = '';
+      }
+    } else if (this.lock)
       return;
 
-    const mx = Math.floor((mouseCoords[0] - offsetCoords[0]) / this.size),
-      my = Math.floor((mouseCoords[1] - offsetCoords[1]) / this.size);
-    const xy = my * this.imageWidth + mx;
-    const steamId = this.steamIDs[xy];
-    if (mx >= 0 && mx <= this.imageWidth - 1 && steamId) {
-      const res = this.getSteamNameAvatar(steamId) /** @type {SteamResponse} */;
+    if (mouse[0] >= 0 && mouse[0] <= this.dimensions[0] - 1 && steamId) {
+      const res = this.getSteamProfileInfo(steamId) /** @type {SteamResponse} */;
 
-      infoElem.classList.remove('hidden');
-      infoElem.style.top = offsetCoords[1] + my * this.size + 'px';
-      infoElem.style.left = offsetCoords[0] + mx * this.size + 'px';
+      this.info.classList.remove('hidden');
 
-      nicknameElem.innerHTML = res.nickname;
-      nicknameElem.href = `https://steamcommunity.com/profiles/${steamId}`;
-      if (avatarElem.src !== res.avatar)
-        avatarElem.src = res.avatar;
-    } else this.infoElem.classList.add('hidden');
+      this.nickname.innerHTML = res.nickname;
+      this.nickname.href = `https://steamcommunity.com/profiles/${steamId}`;
+
+      this.avatar.style.outlineColor = 'rgb(' + this.data.palette[xy].join(',') + ')';
+      this.avatar.src = res.avatar;
+    } else if (!this.lock)
+      this.info.classList.add('hidden');
   }
 
   renderImage() {
-    if (!this.image || !this.palette)
-      return console.error(
-        'renderImage() was called when the image or the palette were not present'
-      );
+    if (!this.data) return;
 
-    this.externalCanvas.width = this.imageWidth;
-    this.externalCanvas.height = this.imageHeight;
+    this.externalCanvas.width = this.dimensions[0];
+    this.externalCanvas.height = this.dimensions[1];
 
-    this.externalCtx.clearRect(0, 0, this.imageWidth, this.imageHeight);
+    this.external.clearRect(0, 0, this.dimensions[0], this.dimensions[1]);
 
-    this.image.forEach((color, xy) => {
+    this.data.image.forEach((color, xy) => {
       if (color == -1) return;
-      const x = xy % this.imageWidth;
-      const y = (xy - x) / this.imageWidth;
+      const x = xy % this.dimensions[0];
+      const y = (xy - x) / this.dimensions[0];
 
-      const rgb = this.palette[color] || [255, 255, 255];
-      this.externalCtx.fillStyle = `rgb(${rgb.join(',')})`;
-      this.externalCtx.fillRect(x, y, 1, 1);
-    });
-
-    this.externalCanvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      this.imageBlob = new Image();
-      this.imageBlob.src = url;
+      this.external.fillStyle = 'rgb(' + this.data.palette[color].join(',') + ')';
+      this.external.fillRect(x, y, 1, 1);
     });
   }
 };

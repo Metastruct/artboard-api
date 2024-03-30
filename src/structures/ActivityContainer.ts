@@ -1,31 +1,45 @@
 import { readdirSync } from 'fs';
+import { scheduleJob } from 'node-schedule';
 
 import Application from '../Application';
-import BaseActivity from '../foundation/BaseActivity';
-import { BaseStructure } from '../foundation/BaseStructure';
+import { BaseStructure } from './BaseStructure';
 import { REGEX_FILENAME } from '../utilities';
+import Activities from '../activities';
 
 export default class ActivityContainer extends BaseStructure {
-  private activities: BaseActivity[] = [];
+  private activities: Activities;
 
-  constructor(application: Application) {
+  constructor(application: Application, activities: Activities) {
     super(application, {});
-
-    this.importActivities();
+    this.activities = activities;
   }
 
   public onImportDone() {
-    this.activities.forEach(x => x.activate());
+    for (const name in this.activities) {
+      const activity = this.activities[name];
+      activity.job = scheduleJob(activity.rule, activity.run);
+    }
   }
 
-  private async importActivities() {
+  public next(activity: keyof Activities) {
+    const selected = this.activities[activity];
+    if (!selected) throw new Error(`no such activity "${activity}"!`);
+
+    return selected.job.nextInvocation();
+  }
+
+  public static async create(application: Application) {
+    const activities: Activities = {};
+
     for (let filename of readdirSync(__dirname + '/../activities/')) {
       filename = filename.replace(REGEX_FILENAME, '');
-      this.activities.push(
-        new (await import('../activities/' + filename)).default(
-          this.application
-        )
-      );
+
+      const activity = (await import('../activities/' + filename)).default;
+      if (!activity) continue;
+
+      activities[filename] = new activity(application);
     }
+
+    return new ActivityContainer(application, activities);
   }
 }
