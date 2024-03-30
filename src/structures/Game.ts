@@ -55,12 +55,12 @@ export default class Game extends BaseStructure {
   public onSocketAddPixel(socket: WebSocket, { pixels, steamId, x, y, color }) {
     if (!socket.hasWriteAccess) return;
 
-    if (pixels) return this.addPixels(pixels, steamId);
-
     if (x && y && color) {
       const xy = y * this.dimensions[0] + x;
-      return this.addPixels({ [xy]: color }, steamId);
+      pixels = { [xy]: color }
     }
+
+    this.addPixels(pixels, steamId);
   }
 
   public onImportDone() {
@@ -73,7 +73,7 @@ export default class Game extends BaseStructure {
     const isProhibited =
       this.banned[steamID] !== undefined ||
       (timeoutDate && Date.now() - timeoutDate < this.timeoutTime);
-    if (!isProhibited) return;
+    if (isProhibited) return;
 
     const imageCopy = this.data.image;
     const steamIDsCopy = this.data.steamIDs;
