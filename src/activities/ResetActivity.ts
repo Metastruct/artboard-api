@@ -1,28 +1,22 @@
-import dayjs from 'dayjs';
 import { existsSync, writeFileSync } from 'fs';
 
-import BaseActivity from '../foundation/BaseActivity';
-import { HISTORY_DATE_FORMAT } from '../utilities';
+import BaseActivity from './BaseActivity';
+import { WEBSOCKET_EVENTS } from '../types';
 
 export default class ResetActivity extends BaseActivity {
   public rule = '* * 1,15 * *';
 
   public async run() {
-    const { Game, Renderer, Web } = this.application.structures;
+    const { Game, Web } = this.application.structures;
 
-    const historyPath = `history/hi-${dayjs().format(HISTORY_DATE_FORMAT)}.dat`;
+    const historyPath = `history/hi-${Date.now()}.dat`;
     if (!existsSync(historyPath)) {
-      const compressed = JSON.stringify({
-        palette: Game.palette,
-        image: Game.image,
-        steamIDs: Game.steamIDs,
-      });
+      const compressed = JSON.stringify(Game.data);
       writeFileSync(historyPath, compressed);
 
-      // await Renderer.createGIF();
       await Game.executeWebhook(true);
       await Game.createEmptyImage();
-      Web.broadcast('imageReset');
+      Web.broadcast(WEBSOCKET_EVENTS.IMAGE_RESET, true);
     }
   }
 }

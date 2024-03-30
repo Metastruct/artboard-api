@@ -1,11 +1,7 @@
 import { Canvas, CanvasRenderingContext2D } from 'canvas';
-import dayjs from 'dayjs';
-import { createWriteStream, readdirSync, unlinkSync } from 'fs';
-// import gm from 'gm';
 
 import Application from '../Application';
-import { BaseStructure } from '../foundation/BaseStructure';
-import { FRAME_DATE_FORMAT } from '../utilities';
+import { BaseStructure } from './BaseStructure';
 
 export default class Renderer extends BaseStructure {
   private readonly canvas: Canvas;
@@ -15,25 +11,25 @@ export default class Renderer extends BaseStructure {
   constructor(application: Application) {
     super(application, { pixelRenderSize: 'number', dimensions: 'array' });
 
-    this.pixelSize = this.application.config.pixelRenderSize;
+    this.pixelSize = this.config.pixelRenderSize;
 
-    const [width, height] = this.application.config.dimensions;
+    const [width, height] = this.config.dimensions;
     this.canvas = new Canvas(width * this.pixelSize, height * this.pixelSize);
     this.ctx = this.canvas.getContext('2d');
   }
 
   public renderFrame() {
-    const { dimensions, image, palette } = this.application.structures.Game,
+    const { dimensions, data } = this.structures.Game,
       [imageWidth] = dimensions;
     const { width, height } = this.canvas;
 
     this.ctx.clearRect(0, 0, width, height);
 
-    image.forEach((color: number | string, xy: number) => {
+    data.image.forEach((color: number | string, xy: number) => {
       if (color === -1) return;
       const x = xy % imageWidth,
         y = (xy - x) / imageWidth;
-      const rgb = palette[color] || [255, 255, 255];
+      const rgb = data.palette[color] || [255, 255, 255];
       color = `rgb(${rgb.join(',')})`;
 
       this.ctx.fillStyle = color;
@@ -73,4 +69,8 @@ export default class Renderer extends BaseStructure {
   //   for (const file of readdirSync('assets/frames/'))
   //     unlinkSync(`assets/frames/${file}`);
   // }
+
+  public static create(application: Application) {
+    return new Renderer(application);
+  }
 }

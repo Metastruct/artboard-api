@@ -1,11 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
 
-body { 
+:root {
+  --background-base: #0b0b0b;
+  --background-highlight: #1a1a1a;
+  --elevated-base: #15151580;
+  --elevated-highlight: #26262680;
+  --elevated-blur: 8px;
+  --text-base: #e3e3e3;
+  --text-subdued: #aaa;
+  --font-family: "Roboto Mono", monospace;
+}
+
+body {
   margin: 0;
   overflow: hidden;
-  font-size: 18px;
-  font-family: "Roboto Mono", monospace;
-  background: url(/darknoise.png);
+  font-size: .9375rem;
+  font-family: var(--font-family);
+  background: var(--background-base);
+  color: var(--text-base);
 }
 
 #canvas {
@@ -24,46 +36,107 @@ body {
   opacity: 0;
 }
 
-.overlay {
-  position: fixed;
+.overlay, .status--container {
   z-index: 999;
 }
 
-.error {
-  background: rgba(0, 0, 0, 0.55);
-  color: #e3e3e3;
-  padding: 1em;
-  position: fixed;
-  width: 100%;
+.status--container {
+  position: absolute;
   bottom: 0;
-  text-align: center;
+  left: 0;
+  width: 100vw;
 }
 
-.hidden {
-  display: none;
+.elevated {
+  background: var(--elevated-base);
+  border: 1px solid var(--elevated-highlight);
+  backdrop-filter: blur(var(--elevated-blur));
+  border-radius: 8px;
+  padding: 1em;
+}
+
+.status {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 1em;
+}
+
+a {
+  color: var(--text-subdued);
 }
 
 .info {
-  background: rgba(0, 0, 0, .75);
-  color: #BFBFBF;
-  border: 1px solid black;
   position: fixed;
-  padding: 1em;
-  transform: translate(-50%, -100%);
+  transform: translate(-50%, -125%);
   text-align: center;
+  transition: .3s;
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  align-items: center;
+  opacity: 0.6;
+  z-index: 998;
+}
+
+.info.locked {
+  opacity: 1;
+  transform: translate(-50%, -100%);
+}
+
+.info.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -150%);
 }
 
 .avatar {
   border-radius: 50%;
+  width: 32px;
+  outline: 4px solid transparent;
+  transition: .3s;
 }
 
-.nickname {
-  display: block;
-  color: #BFBFBF;
-  text-decoration: none;
-  font-size: 16px;
+.item {
+  padding: 0em 1em;
+  display: inherit;
+}
+
+.item:not(:last-child) {
+  border-right: 1px solid var(--elevated-highlight);
 }
 
 .logo {
-  margin: 16px;
+  height: 24px;
+  width: auto;
+}
+
+.status-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+}
+
+.loader {
+  display: inline-block;
+	width: 1ch;
+	height: 1ch;
+	color: inherit;
+	pointer-events: none;
+	border: .15em solid currentcolor;
+	border-bottom-color: transparent;
+	border-radius: 50%;
+	animation: 1s loader linear infinite;
+	position: relative;
+}
+
+@keyframes loader {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }

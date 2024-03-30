@@ -1,5 +1,3 @@
-import axios from 'axios';
-import dayjs from 'dayjs';
 import express from 'express';
 import ratelimit from 'express-rate-limit';
 import { createServer, IncomingMessage, Server } from 'http';
@@ -7,21 +5,21 @@ import { resolve } from 'path';
 import { Data } from 'ws';
 
 import Application from '../Application';
-import { BaseEventEmitterStructure } from '../foundation/BaseStructure';
+import { BaseStructure } from './BaseStructure';
 import {
   WEBSOCKET_UNSUPPORTED_PAYLOAD,
   WebSocketServer,
   WebSocket,
   REMOTE_ADDRESS_PREFIX,
+  STEAM_INFO_MAX_AGE,
+  isIPv4AddressBogon,
 } from '../utilities';
+import { SteamUserInfo, WEBSOCKET_EVENTS, WebSocketAPIEvents } from '../types';
 
-interface ISteamInfo {
-  nickname: string;
-  avatar: string;
-}
+type WebEvents = WebSocketAPIEvents & { connection: undefined };
 
-export default class Web extends BaseEventEmitterStructure {
-  private steamInfoCache: Record<string, ISteamInfo> = {};
+export default class Web extends BaseStructure {
+  private steamInfoCache: Record<string, SteamUserInfo> = {};
   private readonly express: express.Application = express();
   private readonly port: number = 10010;
   private readonly server: Server = createServer(this.express);
@@ -38,34 +36,32 @@ export default class Web extends BaseEventEmitterStructure {
       steamwebAPIkey: 'string',
     });
 
-    this.writeIPs = this.application.config.writeIPs;
-    if (this.application.config.port) this.port = this.application.config.port;
-    this.steamwebAPIkey = this.application.config.steamwebAPIkey;
+    this.writeIPs = this.config.writeIPs;
+    this.port = this.config.port || this.port;
+    this.steamwebAPIkey = this.config.steamwebAPIkey;
+
+    this.handleSteamRequest = this.handleSteamRequest.bind(this);
+    this.handleWebSocketConnection = this.handleWebSocketConnection.bind(this);
+
+    this.websocket.on('connection', this.handleWebSocketConnection);
+
     this.express.set('trust proxy', 1);
     this.express.use(express.static('assets/static/'));
-    this.createRoutes();
-
-    this.websocket.on('connection', (socket, req) =>
-      this.handleWebSocketConnection(socket as WebSocket, req)
-    );
-  }
-
-  private createRoutes() {
     this.express.get('/', (_req, res) =>
       res.sendFile(resolve(__dirname, '../../assets/index.html'))
     );
-    this.express.get('/get/:id', (req, res) =>
-      this.handleSteamRequest(req, res)
-    );
+    this.express.get('/get/:id', this.handleSteamRequest);
     this.express.get(
       '/latest',
+
       ratelimit({
         windowMs: 5 * 60 * 1000,
         max: 10,
       }),
+
       (_req, res) => {
         res.setHeader('Content-Type', 'image/png');
-        this.application.structures.Renderer.renderFrame().pipe(res);
+        this.structures.Renderer.renderFrame().pipe(res);
       }
     );
   }
@@ -76,52 +72,42 @@ export default class Web extends BaseEventEmitterStructure {
     );
   }
 
-  public broadcast(op: string, data: unknown) {
-    for (const client of this.websocket.clients) {
-      client.sendPayload(op, data);
-    }
-  }
-
   private async handleSteamRequest(
     req: express.Request,
     res: express.Response
   ) {
     const id = req.params.id;
-    if (this.steamInfoCache[id])
+    if (
+      this.steamInfoCache[id] &&
+      Date.now() - this.steamInfoCache[id].date < STEAM_INFO_MAX_AGE
+    )
       return res.send(this.steamInfoCache[req.params.id]);
 
     try {
-      const resp = await axios.get(
+      const resp = await fetch(
         `http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${this.steamwebAPIkey}&steamids=${id}`
       );
+      const json = (await resp.json()).response;
 
-      if (resp) {
-        let data: ISteamInfo;
-        const json = resp.data.response;
+      if (json) {
+        let steamInfo: SteamUserInfo;
+
         if (json.players.length === 0) return res.sendStatus(500);
+
         const user = json.players[0];
-        this.steamInfoCache[id] = data = {
+        this.steamInfoCache[id] = steamInfo = {
           nickname: user.personaname,
           avatar: user.avatarmedium,
+          date: Date.now(),
         };
-        res.send(data);
-      } else {
-        res.sendStatus(500);
+
+        return res.send(steamInfo);
       }
+
+      return res.sendStatus(500);
     } catch (err) {
       console.error(err);
     }
-  }
-
-  private isLocal(ip: string) {
-    const parts = ip.split('.');
-    return (
-      parts[0] === '10' ||
-      (parts[0] === '172' &&
-        parseInt(parts[1], 10) >= 16 &&
-        parseInt(parts[1], 10) <= 31) ||
-      (parts[0] === '192' && parts[1] === '168')
-    );
   }
 
   private handleWebSocketConnection(
@@ -134,21 +120,57 @@ export default class Web extends BaseEventEmitterStructure {
     const ip =
       (Array.isArray(forwarded) ? forwarded[0] : forwarded) ||
       request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length);
-    socket.hasWriteAccess =
-      this.writeIPs.indexOf(ip) !== -1 || this.isLocal(ip);
-    console.log('New connection to WS:', ip);
 
-    socket.sendPayload('writeAccess', socket.hasWriteAccess);
-    this.emit('connection', socket);
+    console.log('New connection to the WebSocket server:', ip);
+
+    socket.hasWriteAccess =
+      this.writeIPs.indexOf(ip) !== -1 || isIPv4AddressBogon(ip);
+    socket.sendPayload(WEBSOCKET_EVENTS.WRITE_ACCESS, socket.hasWriteAccess);
+
     socket.on('message', (data: Data) => {
       try {
         const parsed = JSON.parse(data.toString());
+
         if (parsed.op && typeof parsed.op === 'string')
-          this.emit('m_' + parsed.op, socket, parsed.data);
+          this.emit(parsed.op, socket, parsed.data);
         else socket.close(WEBSOCKET_UNSUPPORTED_PAYLOAD);
       } catch (err) {
         socket.close(WEBSOCKET_UNSUPPORTED_PAYLOAD);
       }
     });
+
+    this.emit('connection', socket);
+  }
+
+  public broadcast<Event extends WEBSOCKET_EVENTS>(
+    op: Event,
+    data: WebSocketAPIEvents[Event]
+  ) {
+    for (const client of this.websocket.clients) client.sendPayload(op, data);
+  }
+
+  public on<Event extends keyof WebEvents>(
+    eventName: Event,
+    listener: (socket: WebSocket, data: WebEvents[Event]) => void
+  ): this {
+    return super.on(eventName, listener);
+  }
+
+  public off<Event extends keyof WebEvents>(
+    eventName: Event,
+    listener: (socket: WebSocket, data: WebEvents[Event]) => void
+  ): this {
+    return super.off(eventName, listener);
+  }
+
+  public once<Event extends keyof WebEvents>(
+    eventName: Event,
+    listener: (socket: WebSocket, data: WebEvents[Event]) => void
+  ): this {
+    return super.once(eventName, listener);
+  }
+
+  public static create(application: Application) {
+    return new Web(application);
   }
 }

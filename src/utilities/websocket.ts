@@ -6,10 +6,15 @@ import { GUID, kWebSocket } from 'ws/lib/constants';
 import { format } from 'ws/lib/extension';
 import PerMessageDeflate from 'ws/lib/permessage-deflate';
 
+import { WEBSOCKET_EVENTS, WebSocketAPIEvents } from '../types';
+
 export class WebSocket extends ws {
   public hasWriteAccess = false;
 
-  public sendPayload(op: string, data: any) {
+  public sendPayload<Event extends WEBSOCKET_EVENTS>(
+    op: Event,
+    data: WebSocketAPIEvents[Event]
+  ): void {
     return this.send(JSON.stringify({ op, data }));
   }
 }
@@ -93,10 +98,3 @@ export class WebSocketServer extends ws.Server {
 }
 
 export const WEBSOCKET_UNSUPPORTED_PAYLOAD = 1007;
-export enum WEBSOCKET_EVENTS {
-  ADD_PIXEL = 'addPixel',
-  EXECUTE_TIMEOUT = 'executeTimeout',
-  IMAGE_DATA = 'imageData',
-  IMAGE_RESET = 'imageReset',
-  IMAGE_UPDATE = 'imageUpdate',
-}
