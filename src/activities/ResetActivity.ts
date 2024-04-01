@@ -4,7 +4,7 @@ import BaseActivity from './BaseActivity';
 import { WEBSOCKET_EVENTS } from '../types';
 
 export default class ResetActivity extends BaseActivity {
-  public rule = '* * 1,15 * *';
+  public rule = '0 0 1,15 * *';
 
   public async run() {
     const { Game, Web } = this.application.structures;
