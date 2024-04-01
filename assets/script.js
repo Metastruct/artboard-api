@@ -48,7 +48,8 @@ class Artboard {
     this.processReceivedMessage = this.processReceivedMessage.bind(this);
 
     window.addEventListener('resize', this.onResize);
-    document.addEventListener('mouseup', this.onMouseUp);
+    this.canvas.addEventListener('mouseup', this.onMouseUp);
+    this.canvas.addEventListener('mouseout', this.onMouseUp);
     this.canvas.addEventListener('mousedown', this.onMouseDown);
     this.canvas.addEventListener('mousemove', this.onMouseMove);
     this.canvas.addEventListener('wheel', this.onWheel);
@@ -208,7 +209,7 @@ class Artboard {
         const { diff, steamId } = /** @type {ImageUpdate} */ data;
         for (const position in diff) {
           const color = diff[position] - 1;
-          const xy = parseInt(position);
+          const xy = +position;
           this.data.steamIDs[xy] = steamId;
           this.data.image[xy] = color;
         }
@@ -372,7 +373,9 @@ class Artboard {
       this.nickname.href = `https://steamcommunity.com/profiles/${steamId}`;
 
       const color = this.data.image[xy];
-      this.avatar.style.outlineColor = 'rgb(' + this.data.palette[color].join(',') + ')';
+      this.avatar.style.outlineColor = color === -1 ?
+        'rgb(' + this.data.palette[color] + ')' :
+        'transparent';
       this.avatar.src = res.avatar;
     } else if (!this.lock)
       this.info.classList.add('hidden');

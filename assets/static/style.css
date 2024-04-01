@@ -75,18 +75,19 @@ a {
   flex-direction: row;
   gap: 1em;
   align-items: center;
-  opacity: 0.6;
+  opacity: 0.8;
   z-index: 998;
+  pointer-events: none;
 }
 
 .info.locked {
   opacity: 1;
   transform: translate(-50%, -100%);
+  pointer-events: all;
 }
 
 .info.hidden {
   opacity: 0;
-  pointer-events: none;
   transform: translate(-50%, -150%);
 }
 
