@@ -42,6 +42,7 @@ class Artboard {
     this.onResize = this.onResize.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
+    this.onMouseOut = this.onMouseOut.bind(this);
     this.onMouseMove = this.onMouseMove.bind(this);
     this.onWheel = this.onWheel.bind(this);
     this.renderCanvas = this.renderCanvas.bind(this);
@@ -49,7 +50,7 @@ class Artboard {
 
     window.addEventListener('resize', this.onResize);
     this.canvas.addEventListener('mouseup', this.onMouseUp);
-    this.canvas.addEventListener('mouseout', this.onMouseUp);
+    this.canvas.addEventListener('mouseout', this.onMouseOut);
     this.canvas.addEventListener('mousedown', this.onMouseDown);
     this.canvas.addEventListener('mousemove', this.onMouseMove);
     this.canvas.addEventListener('wheel', this.onWheel);
@@ -64,6 +65,10 @@ class Artboard {
     if (!this.drag)
       this.updateInformationElement(true);
 
+    this.onMouseOut();
+  }
+
+  onMouseOut() {
     this.click = false;
     this.drag = false;
   }
