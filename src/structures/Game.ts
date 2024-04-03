@@ -1,4 +1,3 @@
-import FormData from 'form-data';
 import { promises } from 'fs';
 
 import Application from '../Application';
@@ -226,19 +225,12 @@ export default class Game extends BaseStructure {
     };
 
     const formData = new FormData();
-    formData.append('payload_json', JSON.stringify(payload), {
-      contentType: 'application/json',
-    });
-    formData.append('files[0]', this.structures.Renderer.renderFrame(), {
-      filename: 'image.png',
-    });
-
-    const headers = formData.getHeaders();
+    formData.append('payload_json', JSON.stringify(payload));
+    formData.append('files[0]', new Blob([ this.structures.Renderer.renderFrame() ]), 'image.png');
 
     return fetch(url, {
       method,
-      headers,
-      body: formData as any,
+      body: formData,
     });
   }
 

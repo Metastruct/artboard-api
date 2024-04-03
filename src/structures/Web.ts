@@ -61,7 +61,7 @@ export default class Web extends BaseStructure {
 
       (_req, res) => {
         res.setHeader('Content-Type', 'image/png');
-        this.structures.Renderer.renderFrame().pipe(res);
+        res.send(this.structures.Renderer.renderFrame());
       }
     );
   }
