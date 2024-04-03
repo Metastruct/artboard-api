@@ -179,6 +179,7 @@ export default class Game extends BaseStructure {
     const uniquePixels = image.filter(color => color !== -1);
     const size = this.dimensions[0] * this.dimensions[1];
 
+    let method = 'PATCH';
     let url = `${this.webhookURL}/messages/${this.msgID}`;
     const lastField = {
       name: 'Next Reset:',
@@ -189,6 +190,7 @@ export default class Game extends BaseStructure {
     };
 
     if (toArchive) {
+      method = 'POST';
       url = this.webhookArchiveURL;
       lastField.name = 'Total Participants:';
       lastField.value = String(uniqueIDs.size);
@@ -231,11 +233,11 @@ export default class Game extends BaseStructure {
       filename: 'image.png',
     });
 
-    const formHeaders = formData.getHeaders();
+    const headers = formData.getHeaders();
 
     return fetch(url, {
-      method: 'POST',
-      headers: formHeaders,
+      method,
+      headers,
       body: formData as any,
     });
   }
