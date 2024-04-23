@@ -54,7 +54,7 @@ export default class Game extends BaseStructure {
   public onSocketAddPixel(socket: WebSocket, { pixels, steamId, x, y, color }) {
     if (!socket.hasWriteAccess) return;
 
-    if (x && y && color) {
+    if (x !== undefined && y !== undefined && color !== undefined) {
       const xy = y * this.dimensions[0] + x;
       pixels = { [xy]: color }
     }
