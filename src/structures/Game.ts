@@ -187,18 +187,20 @@ export default class Game extends BaseStructure {
       )}:R>`,
       inline: true,
     };
+    let content = `[click here to view it on the website.](${this.config.host})`;
 
     if (toArchive) {
       method = 'POST';
       url = this.webhookArchiveURL;
       lastField.name = 'Total Participants:';
       lastField.value = String(uniqueIDs.size);
+      content = "";
     }
 
     const payload = {
       username: 'Artboard',
       avatar_url: this.config.host + '/images/icon-avatar.png',
-      content: `[click here to view it on the website.](${this.config.host})`,
+      content,
       embeds: [
         {
           image: { url: 'attachment://image.png' },
