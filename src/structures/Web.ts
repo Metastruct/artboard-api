@@ -114,9 +114,12 @@ export default class Web extends BaseStructure {
     socket: WebSocket,
     request: IncomingMessage
   ) {
+    const forwarded = request.headers['x-forwarded-for'] as string[] | string;
+
+    // Assuming the IP that we want is the first.
     const ip =
       request.headers['cf-connecting-ip'] ||
-      request.headers['x-forwarded-for']?.split(',')[0].trim() ||
+      (Array.isArray(forwarded) ? forwarded[0] : forwarded) ||
       request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length);
 
     console.log('New connection to the WebSocket server:', ip);
