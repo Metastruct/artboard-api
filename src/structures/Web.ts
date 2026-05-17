@@ -115,10 +115,11 @@ export default class Web extends BaseStructure {
     request: IncomingMessage
   ) {
     const forwarded = request.headers['x-forwarded-for'] as string[] | string;
+    const connecting = request.headers['cf-connecting-ip'] as string;
 
     // Assuming the IP that we want is the first.
     const ip =
-      request.headers['cf-connecting-ip'] ||
+      connecting ||
       (Array.isArray(forwarded) ? forwarded[0] : forwarded) ||
       request.socket.remoteAddress.substring(REMOTE_ADDRESS_PREFIX.length);
 
