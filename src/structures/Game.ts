@@ -84,7 +84,7 @@ export default class Game extends BaseStructure {
         color >= this.data.palette.length ||
         color < -1 ||
         xy < 0 ||
-        xy > this.data.image.length
+        xy >= this.data.image.length
       )
         return;
       steamIDsCopy[xy] = steamID;
@@ -158,8 +158,8 @@ export default class Game extends BaseStructure {
       response
     );
 
-    const space = this.dimensions[0] * this.dimensions[1] - 1;
-    for (let i = 1; i <= space; i++) this.data.image.push(-1);
+    const totalPixels = this.dimensions[0] * this.dimensions[1];
+    for (let i = 0; i < totalPixels; i++) this.data.image.push(-1);
 
     this.sendImageData();
   }
@@ -174,7 +174,7 @@ export default class Game extends BaseStructure {
       return false;
 
     const { image, steamIDs, paletteURL } = this.data;
-    const uniqueIDs = new Set(steamIDs.filter(id => id !== null));
+    const uniqueIDs = new Set(steamIDs.filter(id => id != null));
     const uniquePixels = image.filter(color => color !== -1);
     const size = this.dimensions[0] * this.dimensions[1];
 
